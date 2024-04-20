@@ -2,17 +2,20 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
 type echoAPI struct {
+	config *config
 	router *echo.Echo
 }
 
-func NewEchoAPI() *echoAPI {
+func NewEchoAPI(c *config) *echoAPI {
 	server := &echoAPI{
+		config: c,
 		router: echo.New(),
 	}
 	server.setAppHandlers()
@@ -20,7 +23,8 @@ func NewEchoAPI() *echoAPI {
 }
 
 func (s *echoAPI) Listen() error {
-	return s.router.Start(":1323")
+	port := fmt.Sprintf(":%s", s.config.port)
+	return s.router.Start(port)
 }
 
 func (s *echoAPI) Close() {

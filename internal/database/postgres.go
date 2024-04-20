@@ -10,8 +10,8 @@ type postgresDB struct {
 	db *sql.DB
 }
 
-func NewPostgresDB() (*postgresDB, error) {
-	db, err := sql.Open("postgres", "host=localhost port=5432 user=postgres password=postgres dbname=postgres sslmode=disable")
+func NewPostgresDB(c *config) (*postgresDB, error) {
+	db, err := sql.Open("postgres", c.database_url)
 	if err != nil {
 		return nil, err
 	}

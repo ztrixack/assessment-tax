@@ -8,11 +8,11 @@ import (
 )
 
 func main() {
-	_, err := database.NewPostgresDB()
+	_, err := database.NewPostgresDB(database.Config())
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	server := api.NewEchoAPI()
+	server := api.NewEchoAPI(api.Config())
 	server.Listen()
 }
