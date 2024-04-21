@@ -1,0 +1,32 @@
+services:
+  assessment-tax:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.test
+    container_name: assessment-tax-tests
+    depends_on:
+      - postgres
+    ports:
+      - '8080:8080'
+    volumes:
+      - $PWD:/src
+    networks:
+      - integration-test
+
+  postgres:
+    image: postgres:16
+    container_name: postgres-tests
+    restart: on-failure
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: testdb
+    expose:
+      - '5432'
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d/
+    networks:
+      - integration-test
+
+networks:
+  integration-test:
