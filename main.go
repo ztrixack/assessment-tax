@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/ztrixack/assessment-tax/internal/api"
-	"github.com/ztrixack/assessment-tax/internal/database"
-	"github.com/ztrixack/assessment-tax/internal/logger"
+	"github.com/ztrixack/assessment-tax/internal/infra/api"
+	"github.com/ztrixack/assessment-tax/internal/infra/database"
+	"github.com/ztrixack/assessment-tax/internal/infra/logger"
 )
 
 func main() {
