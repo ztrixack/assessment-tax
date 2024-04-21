@@ -5,6 +5,7 @@ go 1.21.9
 require (
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/lib/pq v1.10.9
+	github.com/rs/zerolog v1.32.0
 )
 
 require (
