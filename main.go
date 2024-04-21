@@ -1,14 +1,20 @@
 package main
 
 import (
-	"github.com/labstack/echo/v4"
-	"net/http"
+	"github.com/ztrixack/assessment-tax/internal/api"
+	"github.com/ztrixack/assessment-tax/internal/database"
+	"github.com/ztrixack/assessment-tax/internal/logger"
 )
 
 func main() {
-	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, Go Bootcamp!")
-	})
-	e.Logger.Fatal(e.Start(":1323"))
+	log := logger.NewZerolog(logger.Config())
+
+	_, err := database.NewPostgresDB(database.Config())
+	if err != nil {
+		log.Err(err).C("Failed to connect to database")
+	}
+
+	server := api.NewEchoAPI(api.Config())
+	server.Listen()
+
 }

@@ -7,7 +7,7 @@ test:
 	go test -v ./...
 
 coverage:
-	go test -cover -coverprofile=c.out
+	go test -cover -coverprofile=c.out -v ./...
 	go tool cover -html=c.out -o coverage.html
 
 clean:
