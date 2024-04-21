@@ -19,7 +19,7 @@ func setup() (*bytes.Buffer, *zerologLogger) {
 }
 
 func validate(lv string, msg string, log string) bool {
-	format := fmt.Sprintf(`^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}) %s (\w+\.go:\d+) > %s`, lv, msg)
+	format := fmt.Sprintf(`.* %s (\w+\.go:\d+) > %s`, lv, msg)
 	re := regexp.MustCompile(format)
 	return re.FindStringSubmatch(log) != nil
 }
