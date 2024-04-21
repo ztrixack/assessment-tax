@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/signal"
@@ -18,11 +19,12 @@ type echoAPI struct {
 }
 
 func NewEchoAPI(c *config) *echoAPI {
+	e := echo.New()
+	e.Logger.SetOutput(io.Discard)
 	server := &echoAPI{
 		config: c,
-		router: echo.New(),
+		router: e,
 	}
-	server.setAppHandlers()
 	return server
 }
 
@@ -53,10 +55,4 @@ func (s *echoAPI) Listen() error {
 
 func (s *echoAPI) Close() error {
 	return s.router.Shutdown(context.Background())
-}
-
-func (s *echoAPI) setAppHandlers() {
-	s.router.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, Go Bootcamp!")
-	})
 }

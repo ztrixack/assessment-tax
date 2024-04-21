@@ -1,8 +1,6 @@
 package api
 
 import (
-	"net/http"
-	"net/http/httptest"
 	"os"
 	"os/signal"
 	"syscall"
@@ -22,34 +20,6 @@ func TestNewEchoAPI(t *testing.T) {
 
 	if server.config.port != port {
 		t.Errorf("Expected API port to be '%s' but got '%s'", port, server.config.port)
-	}
-}
-
-func TestEchoAPI_ListenAndServe(t *testing.T) {
-	server := setup()
-	defer server.Close()
-
-	go func() {
-		if err := server.Listen(); err != nil {
-			t.Errorf("Expected no error on server listen but got '%v'", err)
-		}
-	}()
-
-	time.Sleep(1 * time.Second)
-
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	rec := httptest.NewRecorder()
-	server.router.ServeHTTP(rec, req)
-
-	// Test for HTTP status
-	if rec.Code != http.StatusOK {
-		t.Errorf("Expected 'HTTP status 200 OK' but got '%d'", rec.Code)
-	}
-
-	// Test for response body
-	expected := "Hello, Go Bootcamp!"
-	if rec.Body.String() != expected {
-		t.Errorf("Expected response body to be '%s' but got '%s'", expected, rec.Body.String())
 	}
 }
 
