@@ -6,6 +6,8 @@ import (
 	"github.com/rs/zerolog"
 )
 
+var _ Logger = (*zerologLogger)(nil)
+
 type zerologLogger struct {
 	config *config
 	logger *zerolog.Logger

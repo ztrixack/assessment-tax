@@ -6,6 +6,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
+var _ Database = (*postgresDB)(nil)
+
 type postgresDB struct {
 	db *sql.DB
 }

@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,17 +13,20 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+var _ API = (*echoAPI)(nil)
+
 type echoAPI struct {
 	config *config
 	router *echo.Echo
 }
 
 func NewEchoAPI(c *config) *echoAPI {
+	e := echo.New()
+	e.Logger.SetOutput(io.Discard)
 	server := &echoAPI{
 		config: c,
-		router: echo.New(),
+		router: e,
 	}
-	server.setAppHandlers()
 	return server
 }
 
@@ -55,8 +59,6 @@ func (s *echoAPI) Close() error {
 	return s.router.Shutdown(context.Background())
 }
 
-func (s *echoAPI) setAppHandlers() {
-	s.router.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, Go Bootcamp!")
-	})
+func (s *echoAPI) GetRouter() *echo.Echo {
+	return s.router
 }
