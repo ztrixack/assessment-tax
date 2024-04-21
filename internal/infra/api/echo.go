@@ -13,6 +13,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+var _ API = (*echoAPI)(nil)
+
 type echoAPI struct {
 	config *config
 	router *echo.Echo
@@ -55,4 +57,8 @@ func (s *echoAPI) Listen() error {
 
 func (s *echoAPI) Close() error {
 	return s.router.Shutdown(context.Background())
+}
+
+func (s *echoAPI) GetRouter() *echo.Echo {
+	return s.router
 }

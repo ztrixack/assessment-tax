@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/ztrixack/assessment-tax/internal/domain/system"
 	"github.com/ztrixack/assessment-tax/internal/infra/api"
 	"github.com/ztrixack/assessment-tax/internal/infra/database"
 	"github.com/ztrixack/assessment-tax/internal/infra/logger"
@@ -15,6 +16,8 @@ func main() {
 	}
 
 	server := api.NewEchoAPI(api.Config())
-	server.Listen()
 
+	system.New(server)
+
+	server.Listen()
 }
