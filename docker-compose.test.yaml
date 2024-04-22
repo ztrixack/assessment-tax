@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile.test
+    image: assessment-tax-test:test
     container_name: assessment-tax-tests
     depends_on:
       - postgres
