@@ -7,12 +7,11 @@ import (
 type handler struct {
 }
 
-func New(e api.API) *handler {
+func New(e api.API) {
 	server := &handler{}
-	server.setupRoutes(e)
-	return server
+	server.setupRoutes(e.GetRouter())
 }
 
-func (s handler) setupRoutes(r api.API) {
-	r.GetRouter().GET("/", s.Root)
+func (h handler) setupRoutes(r api.Router) {
+	r.GET("/", h.Root)
 }

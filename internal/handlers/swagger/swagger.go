@@ -10,9 +10,9 @@ type handler struct {
 
 func New(e api.API) {
 	server := &handler{}
-	server.setupRoutes(e)
+	server.setupRoutes(e.GetRouter())
 }
 
-func (h handler) setupRoutes(r api.API) {
-	r.GetRouter().GET("/swagger/*", echoSwagger.WrapHandler)
+func (h handler) setupRoutes(r api.Router) {
+	r.GET("/swagger/*", echoSwagger.WrapHandler)
 }

@@ -14,6 +14,6 @@ import (
 //	@produce		text/plain
 //	@success		200	{string}	string	"Hello, Go Bootcamp!"
 //	@router			/ [get]
-func (a handler) Root(c api.Context) error {
+func (h handler) Root(c api.Context) error {
 	return c.String(http.StatusOK, "Hello, Go Bootcamp!")
 }

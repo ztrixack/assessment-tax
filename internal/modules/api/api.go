@@ -9,7 +9,7 @@ type API interface {
 }
 
 type Router interface {
-	GET(string, echo.HandlerFunc)
+	GET(string, echo.HandlerFunc, ...echo.MiddlewareFunc) *echo.Route
 }
 
 type Context = echo.Context
