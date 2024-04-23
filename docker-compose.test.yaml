@@ -1,0 +1,37 @@
+services:
+  assessment-tax:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.test
+    image: assessment-tax:test
+    container_name: assessment-tax-test
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - $PWD:/src
+    networks:
+      - ktaxes-test
+
+  postgres:
+    image: postgres:16
+    container_name: postgres-test
+    restart: on-failure
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: testdb
+    expose:
+      - '5432'
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U test -d testdb'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d/
+    networks:
+      - ktaxes-test
+
+networks:
+  ktaxes-test:

@@ -1,0 +1,11 @@
+FROM golang:1.21-alpine AS runner
+LABEL maintainer="Tanawat Hongthai <ztrixack.th@gmail.com>"
+
+# Set the environment variables for the go command:
+ENV CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64
+
+# Set the working directory outside $GOPATH to enable the support for modules.
+WORKDIR /src
+
+# Start test
+CMD ["go", "test", "--tags=integration", "-v", "./..."]
