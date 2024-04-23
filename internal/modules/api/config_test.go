@@ -11,7 +11,7 @@ func TestConfig(t *testing.T) {
 	defer os.Unsetenv("PORT")
 
 	c := Config()
-	if c.port != expectedPort {
-		t.Errorf("expected '%s' but got '%s'", expectedPort, c.port)
+	if c.Port != expectedPort {
+		t.Errorf("expected '%s' but got '%s'", expectedPort, c.Port)
 	}
 }

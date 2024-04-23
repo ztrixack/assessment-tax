@@ -1,5 +1,3 @@
-//go:build unit
-
 package database
 
 import (
@@ -8,12 +6,12 @@ import (
 )
 
 func TestConfig(t *testing.T) {
-	expectedURL := "postgres://username:password@localhost:5432/dbname"
+	expectedURL := "host=porsgres port=5432 user=porsgres password=porsgres dbname=porsgres sslmode=disable"
 	os.Setenv("DATABASE_URL", expectedURL)
 	defer os.Unsetenv("DATABASE_URL")
 
 	c := Config()
-	if c.database_url != expectedURL {
-		t.Errorf("expected '%s' but got '%s'", expectedURL, c.database_url)
+	if c.DatabaseURL != expectedURL {
+		t.Errorf("expected '%s' but got '%s'", expectedURL, c.DatabaseURL)
 	}
 }

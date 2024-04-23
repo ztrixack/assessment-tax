@@ -1,25 +1,56 @@
 package api
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"os/signal"
 	"syscall"
 	"testing"
 	"time"
+
+	"github.com/labstack/echo/v4"
 )
 
 func setup() *echoAPI {
-	config := &config{port: "9999"}
-	server := NewEchoAPI(config)
-	return server
+	c := &config{Host: "localhost", Port: "9999"}
+	return NewEchoAPI(c)
 }
 
 func TestNewEchoAPI(t *testing.T) {
-	port := "8080"
-	server := NewEchoAPI(&config{port})
+	api := setup()
+	defer api.Close()
 
-	if server.config.port != port {
-		t.Errorf("Expected API port to be '%s' but got '%s'", port, server.config.port)
+	if api.config.Port != "9999" {
+		t.Errorf("Expected API port to be '9999' but got '%s'", api.config.Port)
+	}
+	if api.router == nil {
+		t.Errorf("Router should not be nil")
+	}
+}
+
+func TestEchoAPIRouting(t *testing.T) {
+	api := setup()
+	defer api.Close()
+
+	// Define a test handler
+	api.router.GET("/test", func(c echo.Context) error {
+		return c.String(http.StatusOK, "test passed")
+	})
+
+	// Create a new HTTP request
+	req := httptest.NewRequest(http.MethodGet, "/test", nil)
+	rec := httptest.NewRecorder()
+
+	// Serve HTTP request using the Echo router
+	api.router.ServeHTTP(rec, req)
+
+	// Check the status code and response
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status OK; got %v", rec.Code)
+	}
+	if rec.Body.String() != "test passed" {
+		t.Errorf("Unexpected body %q", rec.Body.String())
 	}
 }
 
@@ -42,21 +73,5 @@ func TestEchoAPI_Notify(t *testing.T) {
 
 	if err := server.Close(); err != nil {
 		t.Errorf("Expected no error on server close but got '%v'", err)
-	}
-}
-
-func TestEchoAPI_Shutdown(t *testing.T) {
-	server := setup()
-
-	go func() {
-		server.Listen()
-	}()
-
-	time.Sleep(1 * time.Second)
-
-	// Shutdown the server
-	err := server.Close()
-	if err != nil {
-		t.Errorf("Expected no error on server shutdown but got '%v'", err)
 	}
 }

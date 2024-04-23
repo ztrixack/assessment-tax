@@ -35,10 +35,10 @@ func TestConfig(t *testing.T) {
 	defer os.Unsetenv("LOG_LEVEL")
 
 	config := Config()
-	if config.level != 1 {
-		t.Errorf("expected '1' but got '%d'", config.level)
+	if config.Level != 1 {
+		t.Errorf("expected '1' but got '%d'", config.Level)
 	}
-	if config.writer != os.Stdout {
-		t.Errorf("expected 'os.Stdout' but got '%v'", config.writer)
+	if config.Writer != os.Stdout {
+		t.Errorf("expected 'os.Stdout' but got '%v'", config.Writer)
 	}
 }

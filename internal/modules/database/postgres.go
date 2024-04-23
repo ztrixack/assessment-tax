@@ -9,11 +9,12 @@ import (
 var _ Database = (*postgresDB)(nil)
 
 type postgresDB struct {
-	db *sql.DB
+	config *config
+	db     *sql.DB
 }
 
 func NewPostgresDB(c *config) (*postgresDB, error) {
-	db, err := sql.Open("postgres", c.database_url)
+	db, err := sql.Open("postgres", c.DatabaseURL)
 	if err != nil {
 		return nil, err
 	}
@@ -22,5 +23,25 @@ func NewPostgresDB(c *config) (*postgresDB, error) {
 		return nil, err
 	}
 
-	return &postgresDB{db}, nil
+	return &postgresDB{c, db}, nil
+}
+
+func (p *postgresDB) Config() config {
+	return *p.config
+}
+
+func (p *postgresDB) Close() error {
+	return p.db.Close()
+}
+
+func (p *postgresDB) Query(query_ string, args ...interface{}) (*sql.Rows, error) {
+	return query(p.db, query_, args...)
+}
+
+func (p *postgresDB) QueryOne(query string, args ...interface{}) (*sql.Row, error) {
+	return queryOne(p.db, query, args...)
+}
+
+func (p *postgresDB) Execute(query string, args ...interface{}) (sql.Result, error) {
+	return execute(p.db, query, args...)
 }

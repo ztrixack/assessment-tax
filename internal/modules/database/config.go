@@ -3,11 +3,11 @@ package database
 import "os"
 
 type config struct {
-	database_url string
+	DatabaseURL string
 }
 
 func Config() *config {
 	return &config{
-		database_url: os.Getenv("DATABASE_URL"),
+		DatabaseURL: os.Getenv("DATABASE_URL"),
 	}
 }

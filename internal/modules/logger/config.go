@@ -6,14 +6,14 @@ import (
 )
 
 type config struct {
-	level  int
-	writer io.Writer
+	Level  int
+	Writer io.Writer
 }
 
 func Config() *config {
 	return &config{
-		level:  getLevelFromEnv(),
-		writer: os.Stdout,
+		Level:  getLevelFromEnv(),
+		Writer: os.Stdout,
 	}
 }
 

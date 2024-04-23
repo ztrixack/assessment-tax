@@ -13,7 +13,7 @@ import (
 
 func setup() (*bytes.Buffer, *zerologLogger) {
 	buffer := new(bytes.Buffer)
-	c := &config{level: 0, writer: buffer}
+	c := &config{Level: 0, Writer: buffer}
 	logger := NewZerolog(c)
 	return buffer, logger
 }

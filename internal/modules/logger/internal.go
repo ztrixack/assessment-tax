@@ -1,6 +1,7 @@
 package logger
 
 type Logger interface {
+	Config() config
 	D(format string, args ...interface{})
 	I(format string, args ...interface{})
 	W(format string, args ...interface{})

@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
@@ -23,11 +24,16 @@ type echoAPI struct {
 func NewEchoAPI(c *config) *echoAPI {
 	e := echo.New()
 	e.Logger.SetOutput(io.Discard)
+	e.Validator = &CustomValidator{validator: validator.New()}
 	server := &echoAPI{
 		config: c,
 		router: e,
 	}
 	return server
+}
+
+func (s *echoAPI) Config() config {
+	return *s.config
 }
 
 func (s *echoAPI) Listen() error {
@@ -36,7 +42,7 @@ func (s *echoAPI) Listen() error {
 	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		port := fmt.Sprintf(":%s", s.config.port)
+		port := fmt.Sprintf("%s:%s", s.config.Host, s.config.Port)
 		if err := s.router.Start(port); err != nil && err != http.ErrServerClosed {
 			reterr = err
 			stop <- os.Interrupt
@@ -59,6 +65,14 @@ func (s *echoAPI) Close() error {
 	return s.router.Shutdown(context.Background())
 }
 
-func (s *echoAPI) GetRouter() *echo.Echo {
+func (s *echoAPI) GetRouter() Router {
 	return s.router
+}
+
+func (s *echoAPI) Use(middleware ...echo.MiddlewareFunc) {
+	s.router.Use(middleware...)
+}
+
+func (s *echoAPI) NewContext(r *http.Request, w http.ResponseWriter) echo.Context {
+	return s.router.NewContext(r, w)
 }

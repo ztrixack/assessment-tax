@@ -15,13 +15,13 @@ type zerologLogger struct {
 
 func NewZerolog(c *config) *zerologLogger {
 	writer := zerolog.ConsoleWriter{
-		Out:        c.writer,
+		Out:        c.Writer,
 		NoColor:    true,
 		TimeFormat: time.RFC3339,
 	}
 
 	logger := zerolog.New(writer).
-		Level(zerolog.Level(c.level)).
+		Level(zerolog.Level(c.Level)).
 		With().
 		Timestamp().
 		Caller().
@@ -33,24 +33,28 @@ func NewZerolog(c *config) *zerologLogger {
 	}
 }
 
+func (l *zerologLogger) Config() config {
+	return *l.config
+}
+
 func (l *zerologLogger) D(format string, args ...interface{}) {
-	l.logger.Debug().Msgf(format, args...)
+	l.logger.Debug().CallerSkipFrame(1).Msgf(format, args...)
 }
 
 func (l *zerologLogger) I(format string, args ...interface{}) {
-	l.logger.Info().Msgf(format, args...)
+	l.logger.Info().CallerSkipFrame(1).Msgf(format, args...)
 }
 
 func (l *zerologLogger) W(format string, args ...interface{}) {
-	l.logger.Warn().Msgf(format, args...)
+	l.logger.Warn().CallerSkipFrame(1).Msgf(format, args...)
 }
 
 func (l *zerologLogger) E(format string, args ...interface{}) {
-	l.logger.Error().Msgf(format, args...)
+	l.logger.Error().CallerSkipFrame(1).Msgf(format, args...)
 }
 
 func (l *zerologLogger) C(format string, args ...interface{}) {
-	l.logger.Fatal().Msgf(format, args...)
+	l.logger.Fatal().CallerSkipFrame(1).Msgf(format, args...)
 }
 
 func (l *zerologLogger) Fields(fields Fields) Logger {
