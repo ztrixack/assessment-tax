@@ -1,0 +1,38 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Assessment Tax API for Go Bootcamp",
+        "title": "Assessment Tax API",
+        "contact": {
+            "name": "Tanawat Hongthai",
+            "url": "https://github.com/ztrixack/assessment-tax.git",
+            "email": "ztrixack.th@gmail.com"
+        },
+        "version": "1.0"
+    },
+    "paths": {
+        "/": {
+            "get": {
+                "description": "Hello, Go Bootcamp!",
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "Hello, Go Bootcamp!",
+                "responses": {
+                    "200": {
+                        "description": "Hello, Go Bootcamp!",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

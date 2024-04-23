@@ -2,42 +2,44 @@ services:
   assessment-tax:
     build:
       context: .
-      dockerfile: ./Dockerfile
-    image: assessment-tax:1.0.0
-    container_name: assessment-tax
+      dockerfile: ./Dockerfile.dev
+    image: assessment-tax:dev
+    container_name: assessment-tax-dev
     depends_on:
       postgres:
         condition: service_healthy
     restart: on-failure
     ports:
       - '8080:8080'
+    volumes:
+      - $PWD:/src
     environment:
       PORT: 8080
-      DATABASE_URL: host=postgres port=5432 user=postgres password=postgres dbname=ktaxes sslmode=disable
+      DATABASE_URL: host=postgres-dev port=5432 user=dev password=dev dbname=devdb sslmode=disable
       ADMIN_USERNAME: adminTax
       ADMIN_PASSWORD: admin!
     networks:
-      - ktaxes
+      - ktaxes-dev
 
   postgres:
     image: postgres:16
-    container_name: postgres
+    container_name: postgres-dev
     restart: on-failure
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: ktaxes
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: devdb
     ports:
       - '5432:5432'
     healthcheck:
-      test: ["CMD-SHELL", "sh -c 'pg_isready -U postgres -d ktaxes'"]
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U dev -d devdb'"]
       interval: 10s
       timeout: 5s
       retries: 5
     volumes:
       - ./db:/docker-entrypoint-initdb.d/
     networks:
-      - ktaxes
+      - ktaxes-dev
 
 networks:
-  ktaxes:
+  ktaxes-dev:

@@ -1,0 +1,25 @@
+info:
+  contact:
+    email: ztrixack.th@gmail.com
+    name: Tanawat Hongthai
+    url: https://github.com/ztrixack/assessment-tax.git
+  description: Assessment Tax API for Go Bootcamp
+  title: Assessment Tax API
+  version: "1.0"
+paths:
+  /:
+    get:
+      description: Hello, Go Bootcamp!
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Hello, Go Bootcamp!
+          schema:
+            type: string
+      summary: Hello, Go Bootcamp!
+      tags:
+      - system
+schemes:
+- http
+swagger: "2.0"
