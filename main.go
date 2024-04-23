@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/ztrixack/assessment-tax/internal/domain/swagger"
 	"github.com/ztrixack/assessment-tax/internal/domain/system"
 	"github.com/ztrixack/assessment-tax/internal/infra/api"
-	"github.com/ztrixack/assessment-tax/internal/infra/api/middlewares"
 	"github.com/ztrixack/assessment-tax/internal/infra/database"
 	"github.com/ztrixack/assessment-tax/internal/infra/logger"
 
@@ -28,9 +28,9 @@ func main() {
 	}
 
 	server := api.NewEchoAPI(api.Config())
-	server.GetRouter().GET("/swagger/*", middlewares.Swagger())
 
 	system.New(server)
+	swagger.New(server)
 
 	log.I("Starting server")
 	server.Listen()
