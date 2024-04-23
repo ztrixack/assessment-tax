@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ztrixack/assessment-tax/internal/infra/api"
+	"github.com/ztrixack/assessment-tax/internal/modules/api"
 )
 
 func TestRootHandler(t *testing.T) {

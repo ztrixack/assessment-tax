@@ -3,7 +3,7 @@ package system
 import (
 	"net/http"
 
-	"github.com/ztrixack/assessment-tax/internal/infra/api"
+	"github.com/ztrixack/assessment-tax/internal/modules/api"
 )
 
 // Root godoc
@@ -14,6 +14,6 @@ import (
 //	@produce		text/plain
 //	@success		200	{string}	string	"Hello, Go Bootcamp!"
 //	@router			/ [get]
-func (a systemAPI) Root(c api.Context) error {
+func (a handler) Root(c api.Context) error {
 	return c.String(http.StatusOK, "Hello, Go Bootcamp!")
 }

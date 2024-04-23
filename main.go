@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/ztrixack/assessment-tax/internal/domain/swagger"
-	"github.com/ztrixack/assessment-tax/internal/domain/system"
-	"github.com/ztrixack/assessment-tax/internal/infra/api"
-	"github.com/ztrixack/assessment-tax/internal/infra/database"
-	"github.com/ztrixack/assessment-tax/internal/infra/logger"
+	"github.com/ztrixack/assessment-tax/internal/handlers/swagger"
+	"github.com/ztrixack/assessment-tax/internal/handlers/system"
+	"github.com/ztrixack/assessment-tax/internal/modules/api"
+	"github.com/ztrixack/assessment-tax/internal/modules/database"
+	"github.com/ztrixack/assessment-tax/internal/modules/logger"
 
 	_ "github.com/ztrixack/assessment-tax/docs"
 )

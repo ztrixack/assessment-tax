@@ -2,7 +2,7 @@ package swagger
 
 import (
 	echoSwagger "github.com/swaggo/echo-swagger"
-	"github.com/ztrixack/assessment-tax/internal/infra/api"
+	"github.com/ztrixack/assessment-tax/internal/modules/api"
 )
 
 type handler struct {
