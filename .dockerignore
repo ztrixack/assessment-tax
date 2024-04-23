@@ -1,0 +1,24 @@
+# Exclude git history and configuration.
+.gitignore
+.git
+
+# Exclude documents
+NOTICE
+README.md
+LICENSE
+AUTHORS.md
+CONTRIBUTING.md
+
+# Editor configurations
+.editorconfig
+
+# dockerfile
+Dockerfile*
+docker-compose.*
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+*.html
+
+# local
+db/

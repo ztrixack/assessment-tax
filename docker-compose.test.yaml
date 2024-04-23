@@ -3,21 +3,19 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile.test
-    image: assessment-tax-test:test
-    container_name: assessment-tax-tests
+    image: assessment-tax:test
+    container_name: assessment-tax-test
     depends_on:
       postgres:
         condition: service_healthy
-    ports:
-      - '8080:8080'
     volumes:
       - $PWD:/src
     networks:
-      - integration-test
+      - ktaxes-test
 
   postgres:
     image: postgres:16
-    container_name: postgres-tests
+    container_name: postgres-test
     restart: on-failure
     environment:
       POSTGRES_USER: test
@@ -26,14 +24,14 @@ services:
     expose:
       - '5432'
     healthcheck:
-      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U test -d testdb'"]
       interval: 10s
       timeout: 5s
       retries: 5
     volumes:
       - ./db:/docker-entrypoint-initdb.d/
     networks:
-      - integration-test
+      - ktaxes-test
 
 networks:
-  integration-test:
+  ktaxes-test:
