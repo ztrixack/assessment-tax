@@ -32,7 +32,7 @@ func TestCalculations(t *testing.T) {
 		{
 			name: "Story: EXP01",
 			mockBehavior: func(ms *tax.MockService) {
-				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 29000.0}, nil)
+				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 29000.0, Refund: 0.0, TaxLevel: []float64{0.0, 29000.0, 0.0, 0.0, 0.0}}, nil)
 			},
 			contentType: "application/json",
 			request: CalculationsRequest{
@@ -41,14 +41,15 @@ func TestCalculations(t *testing.T) {
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0.0}},
 			},
 			expected: CalculationsResponse{
-				Tax: 29000.0,
+				Tax:      29000.0,
+				TaxLevel: []TaxLevel{{"0-150,000", 0.0}, {"150,001-500,000", 29000.0}, {"500,001-1,000,000", 0.0}, {"1,000,001-2,000,000", 0.0}, {"2,000,001 ขึ้นไป", 0.0}},
 			},
 			expectedCode: http.StatusOK,
 		},
 		{
 			name: "Story: EXP02",
 			mockBehavior: func(ms *tax.MockService) {
-				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 4000.0}, nil)
+				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 4000.0, Refund: 0.0, TaxLevel: []float64{0.0, 29000.0, 0.0, 0.0, 0.0}}, nil)
 			},
 			contentType: "application/json",
 			request: CalculationsRequest{
@@ -57,14 +58,15 @@ func TestCalculations(t *testing.T) {
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0.0}},
 			},
 			expected: CalculationsResponse{
-				Tax: 4000.0,
+				Tax:      4000.0,
+				TaxLevel: []TaxLevel{{"0-150,000", 0.0}, {"150,001-500,000", 29000.0}, {"500,001-1,000,000", 0.0}, {"1,000,001-2,000,000", 0.0}, {"2,000,001 ขึ้นไป", 0.0}},
 			},
 			expectedCode: http.StatusOK,
 		},
 		{
 			name: "Story: EXP03",
 			mockBehavior: func(ms *tax.MockService) {
-				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 19000.0}, nil)
+				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 19000.0, Refund: 0.0, TaxLevel: []float64{0.0, 19000.0, 0.0, 0.0, 0.0}}, nil)
 			},
 			contentType: "application/json",
 			request: CalculationsRequest{
@@ -73,30 +75,49 @@ func TestCalculations(t *testing.T) {
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 200000.0}},
 			},
 			expected: CalculationsResponse{
-				Tax: 19000.0,
+				Tax:      19000.0,
+				TaxLevel: []TaxLevel{{"0-150,000", 0.0}, {"150,001-500,000", 19000.0}, {"500,001-1,000,000", 0.0}, {"1,000,001-2,000,000", 0.0}, {"2,000,001 ขึ้นไป", 0.0}},
+			},
+			expectedCode: http.StatusOK,
+		},
+		{
+			name: "Story: EXP04",
+			mockBehavior: func(ms *tax.MockService) {
+				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 19000.0, Refund: 0.0, TaxLevel: []float64{0.0, 19000.0, 0.0, 0.0, 0.0}}, nil)
+			},
+			contentType: "application/json",
+			request: CalculationsRequest{
+				TotalIncome: 500000.0,
+				WHT:         0.0,
+				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 200000.0}},
+			},
+			expected: CalculationsResponse{
+				Tax:      19000.0,
+				TaxLevel: []TaxLevel{{"0-150,000", 0.0}, {"150,001-500,000", 19000.0}, {"500,001-1,000,000", 0.0}, {"1,000,001-2,000,000", 0.0}, {"2,000,001 ขึ้นไป", 0.0}},
 			},
 			expectedCode: http.StatusOK,
 		},
 		{
 			name: "Successful calculation",
 			mockBehavior: func(ms *tax.MockService) {
-				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 90000.0}, nil)
+				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 1360000.0, Refund: 0.0, TaxLevel: []float64{0.0, 35000.0, 75000.0, 200000.0, 1050000.0}}, nil)
 			},
 			contentType: "application/json",
 			request: CalculationsRequest{
-				TotalIncome: 1500000.0,
+				TotalIncome: 5000000.0,
 				WHT:         0.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0.0}},
 			},
 			expected: CalculationsResponse{
-				Tax: 90000.0,
+				Tax:      1360000.0,
+				TaxLevel: []TaxLevel{{"0-150,000", 0.0}, {"150,001-500,000", 35000.0}, {"500,001-1,000,000", 75000.0}, {"1,000,001-2,000,000", 200000.0}, {"2,000,001 ขึ้นไป", 1050000.0}},
 			},
 			expectedCode: http.StatusOK,
 		},
 		{
 			name: "Successful with Refund",
 			mockBehavior: func(ms *tax.MockService) {
-				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 0.0, Refund: 21000.0}, nil)
+				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 0.0, Refund: 21000.0, TaxLevel: []float64{0.0, 29000.0, 0.0, 0.0, 0.0}}, nil)
 			},
 			contentType: "application/json",
 			request: CalculationsRequest{
@@ -107,6 +128,7 @@ func TestCalculations(t *testing.T) {
 			expected: CalculationsResponse{
 				Tax:       0.0,
 				TaxRefund: pointerTo(21000.0),
+				TaxLevel:  []TaxLevel{{"0-150,000", 0.0}, {"150,001-500,000", 29000.0}, {"500,001-1,000,000", 0.0}, {"1,000,001-2,000,000", 0.0}, {"2,000,001 ขึ้นไป", 0.0}},
 			},
 			expectedCode: http.StatusOK,
 		},

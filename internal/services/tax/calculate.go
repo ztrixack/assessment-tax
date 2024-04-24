@@ -11,8 +11,9 @@ type CalculateRequest struct {
 }
 
 type CalculateResponse struct {
-	Tax    float64
-	Refund float64
+	Tax      float64
+	Refund   float64
+	TaxLevel []float64
 }
 
 func (s *service) Calculate(ctx context.Context, req CalculateRequest) (*CalculateResponse, error) {
@@ -27,7 +28,7 @@ func (s *service) Calculate(ctx context.Context, req CalculateRequest) (*Calcula
 	}
 
 	netIncome := max(req.Income-totalAllowances, 0)
-	totalTax, err := calculateProgressiveTax(netIncome)
+	totalTax, stepTax, err := calculateProgressiveTax(netIncome)
 	if err != nil {
 		s.log.Fields(map[string]interface{}{
 			"netIncome":       netIncome,
@@ -38,7 +39,8 @@ func (s *service) Calculate(ctx context.Context, req CalculateRequest) (*Calcula
 	}
 
 	return &CalculateResponse{
-		Tax:    max(totalTax-req.WHT, 0),
-		Refund: max(req.WHT-totalTax, 0),
+		Tax:      max(totalTax-req.WHT, 0),
+		Refund:   max(req.WHT-totalTax, 0),
+		TaxLevel: stepTax,
 	}, nil
 }

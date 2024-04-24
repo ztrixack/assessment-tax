@@ -32,6 +32,10 @@ definitions:
     properties:
       tax:
         type: number
+      taxLevel:
+        items:
+          $ref: '#/definitions/tax.TaxLevel'
+        type: array
       taxRefund:
         type: number
     type: object
@@ -39,6 +43,13 @@ definitions:
     properties:
       error:
         type: string
+    type: object
+  tax.TaxLevel:
+    properties:
+      level:
+        type: string
+      tax:
+        type: number
     type: object
 info:
   contact:

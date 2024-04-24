@@ -30,7 +30,8 @@ func TestCalculate(t *testing.T) {
 			},
 			mockBehavior: defaultMockBehavior,
 			expectedResult: &CalculateResponse{
-				Tax: 29000.0,
+				Tax:      29000.0,
+				TaxLevel: []float64{0, 29000, 0, 0, 0},
 			},
 			wantErr: false,
 		},
@@ -43,7 +44,8 @@ func TestCalculate(t *testing.T) {
 			},
 			mockBehavior: defaultMockBehavior,
 			expectedResult: &CalculateResponse{
-				Tax: 4000.0,
+				Tax:      4000.0,
+				TaxLevel: []float64{0, 29000, 0, 0, 0},
 			},
 			wantErr: false,
 		},
@@ -56,7 +58,8 @@ func TestCalculate(t *testing.T) {
 			},
 			mockBehavior: defaultMockBehavior,
 			expectedResult: &CalculateResponse{
-				Tax: 19000.0,
+				Tax:      19000.0,
+				TaxLevel: []float64{0, 19000, 0, 0, 0},
 			},
 			wantErr: false,
 		},
@@ -68,7 +71,8 @@ func TestCalculate(t *testing.T) {
 			},
 			mockBehavior: defaultMockBehavior,
 			expectedResult: &CalculateResponse{
-				Tax: 101000.0,
+				Tax:      101000.0,
+				TaxLevel: []float64{0, 35000, 66000, 0, 0},
 			},
 			wantErr: false,
 		},
@@ -81,8 +85,9 @@ func TestCalculate(t *testing.T) {
 			},
 			mockBehavior: defaultMockBehavior,
 			expectedResult: &CalculateResponse{
-				Tax:    0.0,
-				Refund: 1000.0,
+				Tax:      0.0,
+				Refund:   1000.0,
+				TaxLevel: []float64{0, 29000, 0, 0, 0},
 			},
 			wantErr: false,
 		},
@@ -95,8 +100,9 @@ func TestCalculate(t *testing.T) {
 			},
 			mockBehavior: defaultMockBehavior,
 			expectedResult: &CalculateResponse{
-				Tax:    9000.0,
-				Refund: 0.0,
+				Tax:      9000.0,
+				Refund:   0.0,
+				TaxLevel: []float64{0, 29000, 0, 0, 0},
 			},
 			wantErr: false,
 		},
@@ -108,7 +114,8 @@ func TestCalculate(t *testing.T) {
 			},
 			mockBehavior: defaultMockBehavior,
 			expectedResult: &CalculateResponse{
-				Tax: 28900.0,
+				Tax:      28900.0,
+				TaxLevel: []float64{0, 28900, 0, 0, 0},
 			},
 			wantErr: false,
 		},
@@ -120,7 +127,8 @@ func TestCalculate(t *testing.T) {
 			},
 			mockBehavior: defaultMockBehavior,
 			expectedResult: &CalculateResponse{
-				Tax: 0.0,
+				Tax:      0.0,
+				TaxLevel: []float64{0, 0, 0, 0, 0},
 			},
 			wantErr: false,
 		},

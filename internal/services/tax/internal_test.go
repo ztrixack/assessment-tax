@@ -50,22 +50,25 @@ func TestCalculateStepTax(t *testing.T) {
 
 func TestCalculateProgressiveTax(t *testing.T) {
 	tests := []struct {
-		name        string
-		income      float64
-		expectedTax float64
-		expectedErr error
+		name          string
+		income        float64
+		expectedTax   float64
+		expectedSteps []float64
+		expectedErr   error
 	}{
 		{
-			name:        "Story: EXP01",
-			income:      440000,
-			expectedTax: 29000,
-			expectedErr: nil,
+			name:          "Story: EXP01",
+			income:        440000,
+			expectedTax:   29000,
+			expectedSteps: []float64{0, 29000, 0, 0, 0},
+			expectedErr:   nil,
 		},
 		{
-			name:        "Story: EXP03",
-			income:      340000,
-			expectedTax: 19000,
-			expectedErr: nil,
+			name:          "Story: EXP03",
+			income:        340000,
+			expectedTax:   19000,
+			expectedSteps: []float64{0, 19000, 0, 0, 0},
+			expectedErr:   nil,
 		},
 		{
 			name:        "Negative income",
@@ -74,71 +77,82 @@ func TestCalculateProgressiveTax(t *testing.T) {
 			expectedErr: ErrNegativeIncome,
 		},
 		{
-			name:        "Zero income",
-			income:      0,
-			expectedTax: 0,
-			expectedErr: nil,
+			name:          "Zero income",
+			income:        0,
+			expectedTax:   0,
+			expectedSteps: []float64{0, 0, 0, 0, 0},
+			expectedErr:   nil,
 		},
 		{
-			name:        "Income within first bracket (0% tax)",
-			income:      150000,
-			expectedTax: 0,
-			expectedErr: nil,
+			name:          "Income within first bracket (0% tax)",
+			income:        150000,
+			expectedTax:   0,
+			expectedSteps: []float64{0, 0, 0, 0, 0},
+			expectedErr:   nil,
 		},
 		{
-			name:        "Income within second bracket on the lower end (10% tax)",
-			income:      150001,
-			expectedTax: 0.1,
-			expectedErr: nil,
+			name:          "Income within second bracket on the lower end (10% tax)",
+			income:        150001,
+			expectedTax:   0.1,
+			expectedSteps: []float64{0, 0.1, 0, 0, 0},
+			expectedErr:   nil,
 		},
 		{
-			name:        "Income within second bracket on the upper end (10% tax)",
-			income:      500000,
-			expectedTax: 35000,
-			expectedErr: nil,
+			name:          "Income within second bracket on the upper end (10% tax)",
+			income:        500000,
+			expectedTax:   35000,
+			expectedSteps: []float64{0, 35000, 0, 0, 0},
+			expectedErr:   nil,
 		},
 		{
-			name:        "Income within third bracket on the lower end (15% tax)",
-			income:      500001,
-			expectedTax: 35000.15,
-			expectedErr: nil,
+			name:          "Income within third bracket on the lower end (15% tax)",
+			income:        500001,
+			expectedTax:   35000.15,
+			expectedSteps: []float64{0, 35000, 0.15, 0, 0},
+			expectedErr:   nil,
 		},
 		{
-			name:        "Income within third bracket on the upper end (15% tax)",
-			income:      1000000,
-			expectedTax: 110000,
-			expectedErr: nil,
+			name:          "Income within third bracket on the upper end (15% tax)",
+			income:        1000000,
+			expectedTax:   110000,
+			expectedSteps: []float64{0, 35000, 75000, 0, 0},
+			expectedErr:   nil,
 		},
 		{
-			name:        "Income within fourth bracket on the lower end (20% tax)",
-			income:      1000001,
-			expectedTax: 110000.2,
-			expectedErr: nil,
+			name:          "Income within fourth bracket on the lower end (20% tax)",
+			income:        1000001,
+			expectedTax:   110000.2,
+			expectedSteps: []float64{0, 35000, 75000, 0.2, 0},
+			expectedErr:   nil,
 		},
 		{
-			name:        "Income within fourth bracket on the upper end (20% tax)",
-			income:      2000000,
-			expectedTax: 310000,
-			expectedErr: nil,
+			name:          "Income within fourth bracket on the upper end (20% tax)",
+			income:        2000000,
+			expectedTax:   310000,
+			expectedSteps: []float64{0, 35000, 75000, 200000, 0},
+			expectedErr:   nil,
 		},
 		{
-			name:        "Income within fifth bracket on the lower end (35% tax)",
-			income:      2000001,
-			expectedTax: 310000.35,
-			expectedErr: nil,
+			name:          "Income within fifth bracket on the lower end (35% tax)",
+			income:        2000001,
+			expectedTax:   310000.35,
+			expectedSteps: []float64{0, 35000, 75000, 200000, 0.35},
+			expectedErr:   nil,
 		},
 		{
-			name:        "Income within fifth bracket (35% tax)",
-			income:      5000000,
-			expectedTax: 1360000,
-			expectedErr: nil,
+			name:          "Income within fifth bracket (35% tax)",
+			income:        5000000,
+			expectedTax:   1360000,
+			expectedSteps: []float64{0, 35000, 75000, 200000, 1050000},
+			expectedErr:   nil,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotTax, gotErr := calculateProgressiveTax(tt.income)
+			gotTax, getStep, gotErr := calculateProgressiveTax(tt.income)
 			assert.Equal(t, tt.expectedErr, gotErr)
+			assert.Equal(t, tt.expectedSteps, getStep)
 			assert.Equal(t, tt.expectedTax, gotTax)
 		})
 	}
