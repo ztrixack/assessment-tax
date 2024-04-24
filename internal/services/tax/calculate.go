@@ -1,6 +1,8 @@
 package tax
 
-import "context"
+import (
+	"context"
+)
 
 type CalculateRequest struct {
 	Income     float64
@@ -14,6 +16,7 @@ type CalculateResponse struct {
 
 func (s *service) Calculate(ctx context.Context, req CalculateRequest) (*CalculateResponse, error) {
 	if req.Income < 0 {
+		s.log.Fields(map[string]interface{}{"income": req.Income}).E("Income cannot be negative")
 		return nil, ErrNegativeIncome
 	}
 
@@ -25,6 +28,11 @@ func (s *service) Calculate(ctx context.Context, req CalculateRequest) (*Calcula
 	netIncome := max(req.Income-totalAllowances, 0)
 	result, err := calculateProgressiveTax(netIncome)
 	if err != nil {
+		s.log.Fields(map[string]interface{}{
+			"netIncome":       netIncome,
+			"income":          req.Income,
+			"totalAllowances": totalAllowances,
+		}).Err(err).E("Failed to calculate progressive tax")
 		return nil, err
 	}
 

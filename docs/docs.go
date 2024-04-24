@@ -71,7 +71,16 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request if the input validation fails"
+                        "description": "Bad request if the input validation fails",
+                        "schema": {
+                            "$ref": "#/definitions/tax.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error if the tax calculations service fails",
+                        "schema": {
+                            "$ref": "#/definitions/tax.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -127,6 +136,14 @@ const docTemplate = `{
                 },
                 "taxRefund": {
                     "type": "number"
+                }
+            }
+        },
+        "tax.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
                 }
             }
         }

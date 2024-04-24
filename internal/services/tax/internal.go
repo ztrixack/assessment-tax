@@ -2,7 +2,7 @@ package tax
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"math"
 )
 
@@ -20,12 +20,13 @@ type AllowanceType string
 const Personal AllowanceType = "personal"
 
 var (
-	ErrNegativeIncome = errors.New("income cannot be negative")
+	ErrNegativeIncome = fmt.Errorf("income cannot be negative")
 )
 
 func (s *service) calculateAllowances(_ []Allowance) (float64, error) {
 	allowances, err := s.getAllowances()
 	if err != nil {
+		s.log.Err(err).E("Failed to get allowances from database.")
 		return 0, err
 	}
 
@@ -37,14 +38,12 @@ func (s *service) calculateAllowances(_ []Allowance) (float64, error) {
 func (s *service) getAllowances() (map[AllowanceType]float64, error) {
 	row, err := s.db.QueryOne("SELECT personal FROM allowances")
 	if err != nil {
-		s.log.Err(err).E("Failed to get allowances from database, use default allowances instead.")
 		return nil, err
 	}
 
 	var personal float64
 	err = row.Scan(&personal)
 	if err != nil {
-		s.log.Err(err).E("Failed to get allowances from database, use default allowances instead.")
 		return nil, err
 	}
 

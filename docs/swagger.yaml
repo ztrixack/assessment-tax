@@ -35,6 +35,11 @@ definitions:
       taxRefund:
         type: number
     type: object
+  tax.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
 info:
   contact:
     email: ztrixack.th@gmail.com
@@ -80,6 +85,12 @@ paths:
             $ref: '#/definitions/tax.CalculationsResponse'
         "400":
           description: Bad request if the input validation fails
+          schema:
+            $ref: '#/definitions/tax.ErrorResponse'
+        "500":
+          description: Internal server error if the tax calculations service fails
+          schema:
+            $ref: '#/definitions/tax.ErrorResponse'
       summary: Calculate Tax
       tags:
       - tax

@@ -11,8 +11,14 @@ var (
 	ErrCalculateTax   = fmt.Errorf("failed to calculate tax")
 )
 
-func toResponse(r tax.CalculateResponse) CalculationsResponse {
+func toCalculationsResponse(r tax.CalculateResponse) CalculationsResponse {
 	return CalculationsResponse{
 		Tax: r.Tax,
+	}
+}
+
+func toErrorResponse(err error) ErrorResponse {
+	return ErrorResponse{
+		Error: err.Error(),
 	}
 }
