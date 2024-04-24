@@ -49,7 +49,11 @@ func (h *handler) Calculations(c api.Context) error {
 		return c.JSON(http.StatusBadRequest, ErrInvalidRequest)
 	}
 
-	res := h.tax.Calculate(ctx, req.toServiceRequest())
+	res, err := h.tax.Calculate(ctx, req.toServiceRequest())
+	if err != nil {
+		h.log.Err(err).E("Failed to calculate tax")
+		return c.JSON(http.StatusInternalServerError, ErrCalculateTax)
+	}
 
 	return c.JSON(http.StatusOK, toResponse(*res))
 }

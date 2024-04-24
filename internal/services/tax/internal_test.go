@@ -113,7 +113,8 @@ func TestCalculateProgressiveTax(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotTax := calculateProgressiveTax(tt.income)
+			gotTax, gotErr := calculateProgressiveTax(tt.income)
+			assert.Equal(t, tt.expectedErr, gotErr)
 			assert.Equal(t, tt.expectedTax, gotTax)
 		})
 	}

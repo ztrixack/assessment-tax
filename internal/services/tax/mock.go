@@ -12,7 +12,11 @@ type MockService struct {
 	mock.Mock
 }
 
-func (m *MockService) Calculate(ctx context.Context, req CalculateRequest) *CalculateResponse {
+func (m *MockService) Calculate(ctx context.Context, req CalculateRequest) (*CalculateResponse, error) {
 	args := m.Called(ctx, req)
-	return args.Get(0).(*CalculateResponse)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+
+	return args.Get(0).(*CalculateResponse), args.Error(1)
 }

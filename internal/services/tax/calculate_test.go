@@ -13,6 +13,7 @@ func TestCalculate(t *testing.T) {
 		name           string
 		request        CalculateRequest
 		expectedResult *CalculateResponse
+		wantErr        bool
 	}{
 		{
 			name: "Story: EXP01",
@@ -23,6 +24,16 @@ func TestCalculate(t *testing.T) {
 			expectedResult: &CalculateResponse{
 				Tax: 29000.0,
 			},
+			wantErr: false,
+		},
+		{
+			name: "error in tax calculation",
+			request: CalculateRequest{
+				Income:     -1,
+				Allowances: []Allowance{},
+			},
+			expectedResult: nil,
+			wantErr:        true,
 		},
 	}
 
@@ -33,9 +44,13 @@ func TestCalculate(t *testing.T) {
 
 			ctx := context.Background()
 
-			result := s.Calculate(ctx, tt.request)
-
-			assert.Equal(t, tt.expectedResult, result)
+			result, err := s.Calculate(ctx, tt.request)
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expectedResult, result)
+			}
 		})
 	}
 }

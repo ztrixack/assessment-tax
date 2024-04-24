@@ -14,8 +14,13 @@ type CalculateResponse struct {
 
 const DefaultPersonalAllowances = 60000.0
 
-func (s *service) Calculate(ctx context.Context, req CalculateRequest) *CalculateResponse {
-	return &CalculateResponse{
-		Tax: calculateProgressiveTax(req.Income - DefaultPersonalAllowances),
+func (s *service) Calculate(ctx context.Context, req CalculateRequest) (*CalculateResponse, error) {
+	result, err := calculateProgressiveTax(req.Income - DefaultPersonalAllowances)
+	if err != nil {
+		return nil, err
 	}
+
+	return &CalculateResponse{
+		Tax: result,
+	}, nil
 }

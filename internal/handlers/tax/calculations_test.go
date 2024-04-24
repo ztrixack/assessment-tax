@@ -3,6 +3,7 @@ package tax
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -27,7 +28,7 @@ func TestCalculations(t *testing.T) {
 		{
 			name: "Story: EXP01",
 			mockBehavior: func(ms *tax.MockService) {
-				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 29000.0})
+				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 29000.0}, nil)
 			},
 			contentType: "application/json",
 			request: CalculationsRequest{
@@ -43,7 +44,7 @@ func TestCalculations(t *testing.T) {
 		{
 			name: "Successful calculation",
 			mockBehavior: func(ms *tax.MockService) {
-				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 90000.0})
+				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 90000.0}, nil)
 			},
 			contentType: "application/json",
 			request: CalculationsRequest{
@@ -70,6 +71,19 @@ func TestCalculations(t *testing.T) {
 				TotalIncome: -500000.0,
 			},
 			expectedCode: http.StatusBadRequest,
+		},
+		{
+			name: "Calculation service is broken",
+			mockBehavior: func(ms *tax.MockService) {
+				ms.On("Calculate", mock.Anything, mock.Anything).Return(nil, errors.New("some error"))
+			},
+			contentType: "application/json",
+			request: CalculationsRequest{
+				TotalIncome: 1500000.0,
+				WHT:         0.0,
+				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0.0}},
+			},
+			expectedCode: http.StatusInternalServerError,
 		},
 	}
 

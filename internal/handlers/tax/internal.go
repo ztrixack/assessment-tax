@@ -8,6 +8,7 @@ import (
 
 var (
 	ErrInvalidRequest = fmt.Errorf("invalid request")
+	ErrCalculateTax   = fmt.Errorf("failed to calculate tax")
 )
 
 func toResponse(r tax.CalculateResponse) CalculationsResponse {
