@@ -6,6 +6,33 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestValidate(t *testing.T) {
+	tests := []struct {
+		name     string
+		request  SetDeductionRequest
+		wantErr  bool
+		errValue error
+	}{
+		{"Valid Personal Request", SetDeductionRequest{Type: Personal, Amount: 50000}, false, nil},
+		{"Invalid Personal Request", SetDeductionRequest{Type: Personal, Amount: 1000}, true, ErrLessThanLimit(Personal, 10000)},
+		{"Valid KReceipt Request", SetDeductionRequest{Type: KReceipt, Amount: 5000}, false, nil},
+		{"Invalid KReceipt Request", SetDeductionRequest{Type: KReceipt, Amount: 1000000}, true, ErrMoreThanLimit(KReceipt, 100000)},
+		{"Unknown Type", SetDeductionRequest{Type: DeductionType("Unknown"), Amount: 10000}, true, ErrInvalidDeductionType},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := tc.request.validate()
+			if tc.wantErr {
+				assert.Error(t, err)
+				assert.Equal(t, tc.errValue, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
 func TestLimiter(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -31,6 +58,26 @@ func TestLimiter(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
+		})
+	}
+}
+
+func TestSanitizeType(t *testing.T) {
+	tests := []struct {
+		name      string
+		type_     DeductionType
+		wantValue string
+	}{
+		{"Map personal", Personal, "personal"},
+		{"Map k-receipt", KReceipt, "k_receipt"},
+		{"Map k-receipt as string", "k-receipt", "k_receipt"},
+		{"Map anything else", "unknown", "unknown"},
+		{"Map anything else with hyphen", "un-known", "un_known"},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.wantValue, sanitizeType(tc.type_))
 		})
 	}
 }

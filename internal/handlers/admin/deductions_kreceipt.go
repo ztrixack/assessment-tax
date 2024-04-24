@@ -11,7 +11,7 @@ import (
 )
 
 type DeductionsKReceiptRequest struct {
-	Amount float64 `json:"amount" validate:"min=0,max=100000" example:"50000.0"`
+	Amount float64 `json:"amount" validate:"required,min=1,max=100000" example:"50000.0"`
 }
 
 type DeductionsKReceiptResponse struct {

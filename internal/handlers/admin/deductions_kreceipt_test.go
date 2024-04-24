@@ -122,7 +122,7 @@ func TestDeductionsKReceiptRequest_Validation(t *testing.T) {
 		{
 			name: "Amount on the lower end",
 			request: DeductionsKReceiptRequest{
-				Amount: 0.0,
+				Amount: 1.0,
 			},
 			wantErr: false,
 		},
@@ -136,7 +136,7 @@ func TestDeductionsKReceiptRequest_Validation(t *testing.T) {
 		{
 			name: "Amount on the below lower end",
 			request: DeductionsKReceiptRequest{
-				Amount: -1.0,
+				Amount: 0.0,
 			},
 			wantErr: true,
 		},

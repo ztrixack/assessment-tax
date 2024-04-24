@@ -10,6 +10,10 @@ var (
 	ErrDeductKReceipt = fmt.Errorf("unable to set k-receipt deduction")
 )
 
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
 func toErrorResponse(err error) ErrorResponse {
 	return ErrorResponse{
 		Error: err.Error(),

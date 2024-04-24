@@ -238,11 +238,14 @@ const docTemplate = `{
     "definitions": {
         "admin.DeductionsKReceiptRequest": {
             "type": "object",
+            "required": [
+                "amount"
+            ],
             "properties": {
                 "amount": {
                     "type": "number",
                     "maximum": 100000,
-                    "minimum": 0,
+                    "minimum": 1,
                     "example": 50000
                 }
             }

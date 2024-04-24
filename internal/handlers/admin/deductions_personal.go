@@ -18,10 +18,6 @@ type DeductionsPersonalResponse struct {
 	PersonalDeduction float64 `json:"personalDeduction"`
 }
 
-type ErrorResponse struct {
-	Error string `json:"error"`
-}
-
 // DeductionsPersonal sets a personal deduction by admin.
 //
 //	@summary		Set personal deduction

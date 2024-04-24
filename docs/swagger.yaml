@@ -4,8 +4,10 @@ definitions:
       amount:
         example: 50000
         maximum: 100000
-        minimum: 0
+        minimum: 1
         type: number
+    required:
+    - amount
     type: object
   admin.DeductionsKReceiptResponse:
     properties:
