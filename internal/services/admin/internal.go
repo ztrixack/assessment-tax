@@ -3,6 +3,7 @@ package admin
 import (
 	"context"
 	"fmt"
+	"unicode"
 )
 
 type Servicer interface {
@@ -13,9 +14,13 @@ type DeductionType string
 
 const (
 	Personal DeductionType = "personal"
+	KReceipt DeductionType = "k-receipt"
 
 	PersonalMinimum = 10000
 	PersonalMaximum = 100000
+
+	KReceiptMinimum = 0
+	KReceiptMaximum = 100000
 )
 
 var (
@@ -31,6 +36,18 @@ var (
 	}
 )
 
+func (r SetDeductionRequest) validate() error {
+	switch r.Type {
+	case Personal:
+		return limiter(Personal, r.Amount, PersonalMinimum, PersonalMaximum)
+
+	case KReceipt:
+		return limiter(KReceipt, r.Amount, KReceiptMinimum, KReceiptMaximum)
+	}
+
+	return ErrInvalidDeductionType
+}
+
 func limiter(type_ DeductionType, amount, lower, upper float64) error {
 	if amount < lower {
 		return ErrLessThanLimit(type_, lower)
@@ -41,4 +58,17 @@ func limiter(type_ DeductionType, amount, lower, upper float64) error {
 	}
 
 	return nil
+}
+
+func sanitizeType(type_ DeductionType) string {
+	sanitized := make([]rune, len(type_))
+	for i, r := range type_ {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) {
+			sanitized[i] = r
+		} else {
+			sanitized[i] = '_'
+		}
+	}
+
+	return string(sanitized)
 }

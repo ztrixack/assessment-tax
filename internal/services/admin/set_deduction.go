@@ -13,16 +13,14 @@ type SetDeductionRequest struct {
 }
 
 func (s *service) SetDeduction(ctx context.Context, request SetDeductionRequest) (float64, error) {
-	if request.Type != Personal {
-		return 0, ErrInvalidDeductionType
-	}
-
-	if err := limiter(Personal, request.Amount, PersonalMinimum, PersonalMaximum); err != nil {
-		s.log.Err(err).E("Invalid %s deduction amount", request.Type)
+	if err := request.validate(); err != nil {
+		s.log.Err(err).
+			Fields(logger.Fields{"type": request.Type, "amount": request.Amount}).
+			E("Invalid request to set %s deduction", request.Type)
 		return 0, err
 	}
 
-	query := fmt.Sprintf("UPDATE allowances SET %s = $1", request.Type)
+	query := fmt.Sprintf("UPDATE allowances SET %s = $1", sanitizeType(request.Type))
 	_, err := s.db.Execute(query, request.Amount)
 	if err != nil {
 		s.log.Err(err).

@@ -1,4 +1,19 @@
 definitions:
+  admin.DeductionsKReceiptRequest:
+    properties:
+      amount:
+        example: 50000
+        maximum: 100000
+        minimum: 1
+        type: number
+    required:
+    - amount
+    type: object
+  admin.DeductionsKReceiptResponse:
+    properties:
+      kReceipt:
+        type: number
+    type: object
   admin.DeductionsPersonalRequest:
     properties:
       amount:
@@ -108,6 +123,36 @@ paths:
       summary: Hello, Go Bootcamp!
       tags:
       - system
+  /admin/deductions/k-receipt:
+    post:
+      consumes:
+      - application/json
+      description: Sets the k-receipt deduction based on the provided request parameters.
+      parameters:
+      - description: Input request for setting k-receipt deduction
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/admin.DeductionsKReceiptRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully response with updated deduction details
+          schema:
+            $ref: '#/definitions/admin.DeductionsKReceiptResponse'
+        "400":
+          description: Bad request if the input validation fails
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error if there is a problem setting the deduction
+      security:
+      - BasicAuth: []
+      summary: Set k-receipt deduction
+      tags:
+      - admin/deductions
   /admin/deductions/personal:
     post:
       consumes:

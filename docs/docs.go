@@ -39,6 +39,54 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/deductions/k-receipt": {
+            "post": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Sets the k-receipt deduction based on the provided request parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin/deductions"
+                ],
+                "summary": "Set k-receipt deduction",
+                "parameters": [
+                    {
+                        "description": "Input request for setting k-receipt deduction",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/admin.DeductionsKReceiptRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully response with updated deduction details",
+                        "schema": {
+                            "$ref": "#/definitions/admin.DeductionsKReceiptResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request if the input validation fails"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error if there is a problem setting the deduction"
+                    }
+                }
+            }
+        },
         "/admin/deductions/personal": {
             "post": {
                 "security": [
@@ -188,6 +236,28 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "admin.DeductionsKReceiptRequest": {
+            "type": "object",
+            "required": [
+                "amount"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "maximum": 100000,
+                    "minimum": 1,
+                    "example": 50000
+                }
+            }
+        },
+        "admin.DeductionsKReceiptResponse": {
+            "type": "object",
+            "properties": {
+                "kReceipt": {
+                    "type": "number"
+                }
+            }
+        },
         "admin.DeductionsPersonalRequest": {
             "type": "object",
             "properties": {
