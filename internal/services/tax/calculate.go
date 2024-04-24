@@ -26,7 +26,7 @@ func (s *service) Calculate(ctx context.Context, req CalculateRequest) (*Calcula
 	}
 
 	netIncome := max(req.Income-totalAllowances, 0)
-	result, err := calculateProgressiveTax(netIncome)
+	totalTax, err := calculateProgressiveTax(netIncome)
 	if err != nil {
 		s.log.Fields(map[string]interface{}{
 			"netIncome":       netIncome,
@@ -36,5 +36,7 @@ func (s *service) Calculate(ctx context.Context, req CalculateRequest) (*Calcula
 		return nil, err
 	}
 
-	return &CalculateResponse{Tax: result}, nil
+	return &CalculateResponse{
+		Tax: max(totalTax-req.WHT, 0),
+	}, nil
 }

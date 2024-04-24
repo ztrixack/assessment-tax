@@ -42,6 +42,22 @@ func TestCalculations(t *testing.T) {
 			expectedCode: http.StatusOK,
 		},
 		{
+			name: "Story: EXP02",
+			mockBehavior: func(ms *tax.MockService) {
+				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 4000.0}, nil)
+			},
+			contentType: "application/json",
+			request: CalculationsRequest{
+				TotalIncome: 500000.0,
+				WHT:         25000.0,
+				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0.0}},
+			},
+			expected: CalculationsResponse{
+				Tax: 4000.0,
+			},
+			expectedCode: http.StatusOK,
+		},
+		{
 			name: "Successful calculation",
 			mockBehavior: func(ms *tax.MockService) {
 				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 90000.0}, nil)
@@ -134,7 +150,7 @@ func TestCalculationRequest_Validation(t *testing.T) {
 			name: "valid request",
 			request: CalculationsRequest{
 				TotalIncome: 500000.0,
-				WHT:         0.0,
+				WHT:         50000.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0}},
 			},
 			wantErr: false,

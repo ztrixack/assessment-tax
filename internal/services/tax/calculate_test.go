@@ -35,6 +35,19 @@ func TestCalculate(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "Story: EXP02",
+			request: CalculateRequest{
+				Income:     500000.0,
+				WHT:        25000.0,
+				Allowances: []Allowance{},
+			},
+			mockBehavior: defaultMockBehavior,
+			expectedResult: &CalculateResponse{
+				Tax: 4000.0,
+			},
+			wantErr: false,
+		},
+		{
 			name: "Normal case",
 			request: CalculateRequest{
 				Income:     1000000.0,
