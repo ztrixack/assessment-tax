@@ -40,10 +40,6 @@ type TaxLevel struct {
 	Tax   float64 `json:"tax"`
 }
 
-type ErrorResponse struct {
-	Error string `json:"error"`
-}
-
 // Calculations calculates the tax based on total income, withholding tax (WHT), and allowances.
 //
 //	@summary		Calculate Tax

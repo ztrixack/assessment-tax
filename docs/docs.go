@@ -141,6 +141,50 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/tax/calculations/upload-csv": {
+            "post": {
+                "description": "Uploads a CSV file and parses it to JSON.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tax"
+                ],
+                "summary": "Upload CSV file",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Upload CSV tax file",
+                        "name": "taxFile",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully parsed tax data",
+                        "schema": {
+                            "$ref": "#/definitions/tax.UploadCSVResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Unable to process the file, error in file retrieval or content",
+                        "schema": {
+                            "$ref": "#/definitions/tax.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error, failed to read CSV header or records",
+                        "schema": {
+                            "$ref": "#/definitions/tax.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -237,6 +281,20 @@ const docTemplate = `{
                 }
             }
         },
+        "tax.Tax": {
+            "type": "object",
+            "properties": {
+                "tax": {
+                    "type": "number"
+                },
+                "taxRefund": {
+                    "type": "number"
+                },
+                "totalIncome": {
+                    "type": "number"
+                }
+            }
+        },
         "tax.TaxLevel": {
             "type": "object",
             "properties": {
@@ -245,6 +303,17 @@ const docTemplate = `{
                 },
                 "tax": {
                     "type": "number"
+                }
+            }
+        },
+        "tax.UploadCSVResponse": {
+            "type": "object",
+            "properties": {
+                "taxes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tax.Tax"
+                    }
                 }
             }
         }

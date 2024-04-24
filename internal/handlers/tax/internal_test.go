@@ -15,6 +15,7 @@ import (
 	"github.com/ztrixack/assessment-tax/internal/modules/api"
 	"github.com/ztrixack/assessment-tax/internal/modules/logger"
 	"github.com/ztrixack/assessment-tax/internal/services/tax"
+	"github.com/ztrixack/assessment-tax/internal/utils/csv"
 )
 
 func TestToCalculationsResponse(t *testing.T) {
@@ -193,13 +194,19 @@ func TestGetFileFromRequest(t *testing.T) {
 func TestParseCSVFile(t *testing.T) {
 	tests := []struct {
 		name           string
-		file           *multipart.FileHeader
+		setup          func(*testing.T) *multipart.FileHeader
 		expectedResult []tax.CalculateRequest
 		wantErr        bool
 	}{
 		{
-			name: "Dummy Test",
-			file: &multipart.FileHeader{},
+			name: "Successfully",
+			setup: func(t *testing.T) *multipart.FileHeader {
+				file, err := csv.MockFile("totalIncome,wht,donation\n500000,0,0\n600000,40000,20000\n750000,50000,15000", "taxFile")
+				if err != nil {
+					t.Error(err)
+				}
+				return file
+			},
 			expectedResult: []tax.CalculateRequest{
 				{
 					Income:     500000.0,
@@ -219,11 +226,34 @@ func TestParseCSVFile(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "File format is not match",
+			setup: func(t *testing.T) *multipart.FileHeader {
+				file, err := csv.MockFile("totalIncome,wht,donation\n500000,0,0\n600000,40000,20000\n750000,50000", "taxFile")
+				if err != nil {
+					t.Error(err)
+				}
+				return file
+			},
+			wantErr: true,
+		},
+		{
+			name: "File CSV header is invalid",
+			setup: func(t *testing.T) *multipart.FileHeader {
+				file, err := csv.MockFile("totalIncome,wht,invalid\n500000,0,0\n600000,40000,20000\n750000,50000,15000", "taxFile")
+				if err != nil {
+					t.Error(err)
+				}
+				return file
+			},
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := parseCSVFile(tt.file)
+			file := tt.setup(t)
+			result, err := parseCSVFile(file)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {

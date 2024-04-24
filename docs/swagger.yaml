@@ -62,12 +62,28 @@ definitions:
       error:
         type: string
     type: object
+  tax.Tax:
+    properties:
+      tax:
+        type: number
+      taxRefund:
+        type: number
+      totalIncome:
+        type: number
+    type: object
   tax.TaxLevel:
     properties:
       level:
         type: string
       tax:
         type: number
+    type: object
+  tax.UploadCSVResponse:
+    properties:
+      taxes:
+        items:
+          $ref: '#/definitions/tax.Tax'
+        type: array
     type: object
 info:
   contact:
@@ -157,6 +173,35 @@ paths:
           schema:
             $ref: '#/definitions/tax.ErrorResponse'
       summary: Calculate Tax
+      tags:
+      - tax
+  /tax/calculations/upload-csv:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Uploads a CSV file and parses it to JSON.
+      parameters:
+      - description: Upload CSV tax file
+        in: formData
+        name: taxFile
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully parsed tax data
+          schema:
+            $ref: '#/definitions/tax.UploadCSVResponse'
+        "400":
+          description: Unable to process the file, error in file retrieval or content
+          schema:
+            $ref: '#/definitions/tax.ErrorResponse'
+        "500":
+          description: Internal server error, failed to read CSV header or records
+          schema:
+            $ref: '#/definitions/tax.ErrorResponse'
+      summary: Upload CSV file
       tags:
       - tax
 schemes:
