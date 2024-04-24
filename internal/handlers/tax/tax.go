@@ -19,4 +19,5 @@ func New(log logger.Logger, e api.API, tax tax.Servicer) *handler {
 
 func (h handler) setupRoutes(r api.Router) {
 	r.POST("/tax/calculations", h.Calculations)
+	r.POST("/tax/calculations/upload-csv", h.UploadCSV)
 }
