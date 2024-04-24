@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
 	"github.com/ztrixack/assessment-tax/internal/modules/api"
 	"github.com/ztrixack/assessment-tax/internal/modules/logger"
@@ -32,6 +33,34 @@ func TestCalculations(t *testing.T) {
 				Tax: 29000.0,
 			},
 			expectedCode: http.StatusOK,
+		},
+		{
+			name:        "Successful calculation",
+			contentType: "application/json",
+			request: CalculationsRequest{
+				TotalIncome: 500000.0,
+				WHT:         0.0,
+				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0.0}},
+			},
+			expected: CalculationsResponse{
+				Tax: 29000.0,
+			},
+			expectedCode: http.StatusOK,
+		},
+		{
+			name:         "Request parameters are invalid on Bind",
+			contentType:  "text/plain",
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			name:        "Request parameters are invalid on Validate",
+			contentType: "application/json",
+			request: CalculationsRequest{
+				TotalIncome: 500000.0,
+				WHT:         -1000,
+				Allowances:  []Allowance{},
+			},
+			expectedCode: http.StatusBadRequest,
 		},
 	}
 
@@ -63,6 +92,60 @@ func TestCalculations(t *testing.T) {
 				err := json.Unmarshal(rec.Body.Bytes(), &result)
 				assert.NoError(t, err)
 				assert.Equal(t, tt.expected, result)
+			}
+		})
+	}
+}
+
+func TestCalculationRequest_Validation(t *testing.T) {
+	tests := []struct {
+		name    string
+		request CalculationsRequest
+		wantErr bool
+	}{
+		{
+			name: "valid request",
+			request: CalculationsRequest{
+				TotalIncome: 500000.0,
+				WHT:         0.0,
+				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0}},
+			},
+			wantErr: false,
+		},
+		{
+			name: "no wht",
+			request: CalculationsRequest{
+				TotalIncome: 500000.0,
+			},
+			wantErr: false,
+		},
+		{
+			name: "no allowances",
+			request: CalculationsRequest{
+				TotalIncome: 500000.0,
+				WHT:         0.0,
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid total income",
+			request: CalculationsRequest{
+				TotalIncome: -1,
+				WHT:         0.0,
+				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0}},
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			v := validator.New()
+			err := v.Struct(tt.request)
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
 			}
 		})
 	}
