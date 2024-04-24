@@ -134,6 +134,12 @@ const docTemplate = `{
                 "tax": {
                     "type": "number"
                 },
+                "taxLevel": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tax.TaxLevel"
+                    }
+                },
                 "taxRefund": {
                     "type": "number"
                 }
@@ -144,6 +150,17 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string"
+                }
+            }
+        },
+        "tax.TaxLevel": {
+            "type": "object",
+            "properties": {
+                "level": {
+                    "type": "string"
+                },
+                "tax": {
+                    "type": "number"
                 }
             }
         }

@@ -85,9 +85,9 @@ func calculateStepTax(income, lower, upper float64, rate float64) float64 {
 	return taxableIncome * rate
 }
 
-func calculateProgressiveTax(income float64) (float64, error) {
+func calculateProgressiveTax(income float64) (float64, []float64, error) {
 	if income < 0 {
-		return 0, ErrNegativeIncome
+		return 0, nil, ErrNegativeIncome
 	}
 
 	total := 0.0
@@ -102,13 +102,16 @@ func calculateProgressiveTax(income float64) (float64, error) {
 		{1000000, 2000000, 0.20},         // 20% for income between 1,000,001 - 2,000,000
 		{2000000, math.MaxFloat64, 0.35}, // 35% for income over 2,000,001
 	}
+	steps := make([]float64, len(brackets))
 
-	for _, bracket := range brackets {
+	for i, bracket := range brackets {
 		if income > bracket.lower {
 			upper := math.Min(income, bracket.upper)
-			total += calculateStepTax(income, bracket.lower, upper, bracket.rate)
+			tax := calculateStepTax(income, bracket.lower, upper, bracket.rate)
+			steps[i] = tax
+			total += tax
 		}
 	}
 
-	return total, nil
+	return total, steps, nil
 }
