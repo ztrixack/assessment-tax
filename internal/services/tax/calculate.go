@@ -12,15 +12,16 @@ type CalculateResponse struct {
 	Tax float64
 }
 
-const DefaultPersonalAllowances = 60000.0
-
 func (s *service) Calculate(ctx context.Context, req CalculateRequest) (*CalculateResponse, error) {
-	result, err := calculateProgressiveTax(req.Income - DefaultPersonalAllowances)
+	totalAllowances, err := s.calculateAllowances(req.Allowances)
 	if err != nil {
 		return nil, err
 	}
 
-	return &CalculateResponse{
-		Tax: result,
-	}, nil
+	result, err := calculateProgressiveTax(req.Income - totalAllowances)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CalculateResponse{Tax: result}, nil
 }

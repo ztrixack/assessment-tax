@@ -11,13 +11,45 @@ type Servicer interface {
 }
 
 type Allowance struct {
-	Type   string
+	Type   AllowanceType
 	Amount float64
 }
+
+type AllowanceType string
+
+const Personal AllowanceType = "personal"
 
 var (
 	ErrNegativeIncome = errors.New("income cannot be negative")
 )
+
+func (s *service) calculateAllowances(_ []Allowance) (float64, error) {
+	allowances, err := s.getAllowances()
+	if err != nil {
+		return 0, err
+	}
+
+	personal := allowances[Personal]
+
+	return personal, nil
+}
+
+func (s *service) getAllowances() (map[AllowanceType]float64, error) {
+	row, err := s.db.QueryOne("SELECT personal FROM allowances")
+	if err != nil {
+		s.log.Err(err).E("Failed to get allowances from database, use default allowances instead.")
+		return nil, err
+	}
+
+	var personal float64
+	err = row.Scan(&personal)
+	if err != nil {
+		s.log.Err(err).E("Failed to get allowances from database, use default allowances instead.")
+		return nil, err
+	}
+
+	return map[AllowanceType]float64{Personal: personal}, nil
+}
 
 func calculateStepTax(income, lower, upper float64, rate float64) float64 {
 	taxableIncome := min(income, upper) - lower
