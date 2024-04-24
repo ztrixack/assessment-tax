@@ -13,7 +13,8 @@ var (
 
 func toCalculationsResponse(r tax.CalculateResponse) CalculationsResponse {
 	return CalculationsResponse{
-		Tax: r.Tax,
+		Tax:       r.Tax,
+		TaxRefund: remapTaxRefund(r.Refund),
 	}
 }
 
@@ -21,4 +22,12 @@ func toErrorResponse(err error) ErrorResponse {
 	return ErrorResponse{
 		Error: err.Error(),
 	}
+}
+
+func remapTaxRefund(refund float64) *float64 {
+	if refund == 0.0 {
+		return nil
+	}
+
+	return &refund
 }

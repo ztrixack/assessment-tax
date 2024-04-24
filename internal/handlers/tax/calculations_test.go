@@ -17,6 +17,10 @@ import (
 )
 
 func TestCalculations(t *testing.T) {
+	pointerTo := func(value float64) *float64 {
+		return &value
+	}
+
 	tests := []struct {
 		name         string
 		mockBehavior func(*tax.MockService)
@@ -42,6 +46,22 @@ func TestCalculations(t *testing.T) {
 			expectedCode: http.StatusOK,
 		},
 		{
+			name: "Story: EXP02",
+			mockBehavior: func(ms *tax.MockService) {
+				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 4000.0}, nil)
+			},
+			contentType: "application/json",
+			request: CalculationsRequest{
+				TotalIncome: 500000.0,
+				WHT:         25000.0,
+				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0.0}},
+			},
+			expected: CalculationsResponse{
+				Tax: 4000.0,
+			},
+			expectedCode: http.StatusOK,
+		},
+		{
 			name: "Successful calculation",
 			mockBehavior: func(ms *tax.MockService) {
 				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 90000.0}, nil)
@@ -54,6 +74,23 @@ func TestCalculations(t *testing.T) {
 			},
 			expected: CalculationsResponse{
 				Tax: 90000.0,
+			},
+			expectedCode: http.StatusOK,
+		},
+		{
+			name: "Successful with Refund",
+			mockBehavior: func(ms *tax.MockService) {
+				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 0.0, Refund: 21000.0}, nil)
+			},
+			contentType: "application/json",
+			request: CalculationsRequest{
+				TotalIncome: 500000.0,
+				WHT:         50000.0,
+				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0.0}},
+			},
+			expected: CalculationsResponse{
+				Tax:       0.0,
+				TaxRefund: pointerTo(21000.0),
 			},
 			expectedCode: http.StatusOK,
 		},
@@ -134,7 +171,7 @@ func TestCalculationRequest_Validation(t *testing.T) {
 			name: "valid request",
 			request: CalculationsRequest{
 				TotalIncome: 500000.0,
-				WHT:         0.0,
+				WHT:         50000.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0}},
 			},
 			wantErr: false,
