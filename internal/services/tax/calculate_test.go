@@ -11,8 +11,8 @@ import (
 
 func TestCalculate(t *testing.T) {
 	defaultMockBehavior := func(mock sqlmock.Sqlmock) {
-		rows := sqlmock.NewRows([]string{"personal"}).AddRow(60000)
-		mock.ExpectPrepare("SELECT personal FROM allowances").ExpectQuery().WillReturnRows(rows)
+		rows := sqlmock.NewRows([]string{"personal", "donation"}).AddRow(60000, 100000)
+		mock.ExpectPrepare("SELECT personal, donation FROM allowances").ExpectQuery().WillReturnRows(rows)
 	}
 
 	tests := []struct {
@@ -44,6 +44,19 @@ func TestCalculate(t *testing.T) {
 			mockBehavior: defaultMockBehavior,
 			expectedResult: &CalculateResponse{
 				Tax: 4000.0,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Story: EXP03",
+			request: CalculateRequest{
+				Income:     500000.0,
+				WHT:        0.0,
+				Allowances: []Allowance{{Type: Donation, Amount: 200000.0}},
+			},
+			mockBehavior: defaultMockBehavior,
+			expectedResult: &CalculateResponse{
+				Tax: 19000.0,
 			},
 			wantErr: false,
 		},
@@ -88,6 +101,18 @@ func TestCalculate(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "Income more than Allowance",
+			request: CalculateRequest{
+				Income:     500000.0,
+				Allowances: []Allowance{{Type: Donation, Amount: 1000.0}},
+			},
+			mockBehavior: defaultMockBehavior,
+			expectedResult: &CalculateResponse{
+				Tax: 28900.0,
+			},
+			wantErr: false,
+		},
+		{
 			name: "Income is lower than all allowances",
 			request: CalculateRequest{
 				Income:     50000.0,
@@ -116,7 +141,7 @@ func TestCalculate(t *testing.T) {
 				Allowances: []Allowance{},
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock) {
-				mock.ExpectPrepare("SELECT personal FROM allowances").ExpectQuery().WillReturnError(errors.New("some error"))
+				mock.ExpectPrepare("SELECT personal, donation FROM allowances").ExpectQuery().WillReturnError(errors.New("some error"))
 			},
 			expectedResult: nil,
 			wantErr:        true,
@@ -130,6 +155,7 @@ func TestCalculate(t *testing.T) {
 			defer close()
 
 			tt.mockBehavior(mock)
+
 			result, err := svr.Calculate(ctx, tt.request)
 
 			if tt.wantErr {

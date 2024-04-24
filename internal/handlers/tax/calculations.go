@@ -20,7 +20,7 @@ func (r *CalculationsRequest) toServiceRequest() tax.CalculateRequest {
 	return tax.CalculateRequest{
 		Income:     r.TotalIncome,
 		WHT:        r.WHT,
-		Allowances: []tax.Allowance{},
+		Allowances: remapAllowances(r.Allowances),
 	}
 }
 

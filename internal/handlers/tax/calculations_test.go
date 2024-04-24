@@ -62,6 +62,22 @@ func TestCalculations(t *testing.T) {
 			expectedCode: http.StatusOK,
 		},
 		{
+			name: "Story: EXP03",
+			mockBehavior: func(ms *tax.MockService) {
+				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 19000.0}, nil)
+			},
+			contentType: "application/json",
+			request: CalculationsRequest{
+				TotalIncome: 500000.0,
+				WHT:         0.0,
+				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 200000.0}},
+			},
+			expected: CalculationsResponse{
+				Tax: 19000.0,
+			},
+			expectedCode: http.StatusOK,
+		},
+		{
 			name: "Successful calculation",
 			mockBehavior: func(ms *tax.MockService) {
 				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 90000.0}, nil)
@@ -172,7 +188,7 @@ func TestCalculationRequest_Validation(t *testing.T) {
 			request: CalculationsRequest{
 				TotalIncome: 500000.0,
 				WHT:         50000.0,
-				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0}},
+				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 200000.0}},
 			},
 			wantErr: false,
 		},
@@ -200,6 +216,24 @@ func TestCalculationRequest_Validation(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{
+			name: "invalid allowance type",
+			request: CalculationsRequest{
+				TotalIncome: 500000.0,
+				WHT:         5000.0,
+				Allowances:  []Allowance{{AllowanceType: "unknown", Amount: 10000}},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid allowance amount",
+			request: CalculationsRequest{
+				TotalIncome: 500000.0,
+				WHT:         5000.0,
+				Allowances:  []Allowance{{AllowanceType: "donation", Amount: -500}},
+			},
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {
@@ -211,6 +245,39 @@ func TestCalculationRequest_Validation(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
+		})
+	}
+}
+
+func TestCalculationsRequest_ToServiceRequest(t *testing.T) {
+	tests := []struct {
+		name     string
+		request  CalculationsRequest
+		expected tax.CalculateRequest
+	}{
+		{
+			name: "valid request",
+			request: CalculationsRequest{
+				TotalIncome: 500000.0,
+				WHT:         5000.0,
+				Allowances: []Allowance{
+					{AllowanceType: "donation", Amount: 10000},
+				},
+			},
+			expected: tax.CalculateRequest{
+				Income: 500000.0,
+				WHT:    5000.0,
+				Allowances: []tax.Allowance{
+					{Type: tax.AllowanceType("donation"), Amount: 10000},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.request.toServiceRequest()
+			assert.Equal(t, tt.expected, result)
 		})
 	}
 }

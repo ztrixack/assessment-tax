@@ -15,15 +15,22 @@ type Allowance struct {
 	Amount float64
 }
 
+type AllowanceList map[AllowanceType]float64
+
 type AllowanceType string
 
-const Personal AllowanceType = "personal"
-
-var (
-	ErrNegativeIncome = fmt.Errorf("income cannot be negative")
+const (
+	Personal AllowanceType = "personal"
+	Donation AllowanceType = "donation"
 )
 
-func (s *service) calculateAllowances(_ []Allowance) (float64, error) {
+var (
+	ErrNegativeIncome           = fmt.Errorf("income cannot be negative")
+	ErrNegativeAllowanceAmount  = fmt.Errorf("allowance amount cannot be negative")
+	ErrUnsupportedAllowanceType = fmt.Errorf("allowance type not supported")
+)
+
+func (s *service) calculateAllowances(allowanceList []Allowance) (float64, error) {
 	allowances, err := s.getAllowances()
 	if err != nil {
 		s.log.Err(err).E("Failed to get allowances from database.")
@@ -31,23 +38,46 @@ func (s *service) calculateAllowances(_ []Allowance) (float64, error) {
 	}
 
 	personal := allowances[Personal]
+	donation := 0.0
 
-	return personal, nil
+	for _, allowance := range allowanceList {
+		if allowance.Amount < 0 {
+			s.log.Fields(map[string]interface{}{"allowance": allowance}).W("Allowance amount cannot be negative.")
+			return 0, ErrNegativeAllowanceAmount
+		}
+
+		switch allowance.Type {
+		case Donation:
+			donation += allowance.Amount
+
+		default:
+			s.log.Fields(map[string]interface{}{"allowance": allowance}).W("Allowance type not supported.")
+			return 0, ErrUnsupportedAllowanceType
+		}
+	}
+
+	donation = calculateAllowance(donation, 0, allowances[Donation])
+
+	return personal + donation, nil
 }
 
-func (s *service) getAllowances() (map[AllowanceType]float64, error) {
-	row, err := s.db.QueryOne("SELECT personal FROM allowances")
+func calculateAllowance(amount, lower, upper float64) float64 {
+	return min(max(amount, lower), upper)
+}
+
+func (s *service) getAllowances() (AllowanceList, error) {
+	row, err := s.db.QueryOne("SELECT personal, donation FROM allowances")
 	if err != nil {
 		return nil, err
 	}
 
-	var personal float64
-	err = row.Scan(&personal)
+	var personal, donation float64
+	err = row.Scan(&personal, &donation)
 	if err != nil {
 		return nil, err
 	}
 
-	return map[AllowanceType]float64{Personal: personal}, nil
+	return AllowanceList{Personal: personal, Donation: donation}, nil
 }
 
 func calculateStepTax(income, lower, upper float64, rate float64) float64 {

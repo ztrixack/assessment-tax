@@ -31,3 +31,16 @@ func remapTaxRefund(refund float64) *float64 {
 
 	return &refund
 }
+
+func remapAllowances(allowances []Allowance) []tax.Allowance {
+	result := make([]tax.Allowance, len(allowances))
+
+	for i, a := range allowances {
+		result[i] = tax.Allowance{
+			Type:   tax.AllowanceType(a.AllowanceType),
+			Amount: a.Amount,
+		}
+	}
+
+	return result
+}
