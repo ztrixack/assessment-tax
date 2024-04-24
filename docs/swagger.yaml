@@ -22,6 +22,7 @@ definitions:
       allowanceType:
         enum:
         - donation
+        - k-receipt
         example: donation
         type: string
       amount:

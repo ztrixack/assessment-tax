@@ -25,7 +25,7 @@ func (r *CalculationsRequest) toServiceRequest() tax.CalculateRequest {
 }
 
 type Allowance struct {
-	AllowanceType string  `json:"allowanceType" validate:"required,oneof=donation" example:"donation"`
+	AllowanceType string  `json:"allowanceType" validate:"required,oneof=donation k-receipt" example:"donation"`
 	Amount        float64 `json:"amount" validate:"min=0" example:"0.0"`
 }
 

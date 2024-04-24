@@ -11,8 +11,8 @@ import (
 
 func TestCalculate(t *testing.T) {
 	defaultMockBehavior := func(mock sqlmock.Sqlmock) {
-		rows := sqlmock.NewRows([]string{"personal", "donation"}).AddRow(60000, 100000)
-		mock.ExpectPrepare("SELECT personal, donation FROM allowances").ExpectQuery().WillReturnRows(rows)
+		rows := sqlmock.NewRows([]string{"personal", "donation", "k_receipt"}).AddRow(60000, 100000, 50000)
+		mock.ExpectPrepare("SELECT personal, donation, k_receipt FROM allowances").ExpectQuery().WillReturnRows(rows)
 	}
 
 	tests := []struct {
@@ -60,6 +60,20 @@ func TestCalculate(t *testing.T) {
 			expectedResult: &CalculateResponse{
 				Tax:      19000.0,
 				TaxLevel: []float64{0, 19000, 0, 0, 0},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Story: EXP07",
+			request: CalculateRequest{
+				Income:     500000.0,
+				WHT:        0.0,
+				Allowances: []Allowance{{Type: KReceipt, Amount: 200000.0}, {Type: Donation, Amount: 100000.0}},
+			},
+			mockBehavior: defaultMockBehavior,
+			expectedResult: &CalculateResponse{
+				Tax:      14000.0,
+				TaxLevel: []float64{0, 14000, 0, 0, 0},
 			},
 			wantErr: false,
 		},
@@ -149,7 +163,7 @@ func TestCalculate(t *testing.T) {
 				Allowances: []Allowance{},
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock) {
-				mock.ExpectPrepare("SELECT personal, donation FROM allowances").ExpectQuery().WillReturnError(errors.New("some error"))
+				mock.ExpectPrepare("SELECT personal, donation, k_receipt FROM allowances").ExpectQuery().WillReturnError(errors.New("some error"))
 			},
 			expectedResult: nil,
 			wantErr:        true,
