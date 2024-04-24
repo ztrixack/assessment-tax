@@ -1,10 +1,13 @@
 package admin
 
 import (
+	"context"
 	"net/http"
+	"time"
 
 	"github.com/ztrixack/assessment-tax/internal/modules/api"
 	"github.com/ztrixack/assessment-tax/internal/modules/logger"
+	"github.com/ztrixack/assessment-tax/internal/services/admin"
 )
 
 type DeductionsPersonalRequest struct {
@@ -20,6 +23,9 @@ type ErrorResponse struct {
 }
 
 func (h handler) DeductionsPersonal(c api.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
 	if c.Request().Body == http.NoBody {
 		return c.JSON(http.StatusBadRequest, toErrorResponse(ErrInvalidRequest))
 	}
@@ -35,7 +41,7 @@ func (h handler) DeductionsPersonal(c api.Context) error {
 		return c.JSON(http.StatusBadRequest, toErrorResponse(ErrInvalidRequest))
 	}
 
-	res, err := dumpService(req)
+	res, err := h.admin.SetDeduction(ctx, req.toServiceRequest())
 	if err != nil {
 		h.log.Err(err).E("Failed to set personal deduction")
 		return c.JSON(http.StatusInternalServerError, toErrorResponse(ErrDeductPersonal))
@@ -44,6 +50,9 @@ func (h handler) DeductionsPersonal(c api.Context) error {
 	return c.JSON(http.StatusOK, DeductionsPersonalResponse{PersonalDeduction: res})
 }
 
-func dumpService(req DeductionsPersonalRequest) (float64, error) {
-	return req.Amount, nil
+func (r *DeductionsPersonalRequest) toServiceRequest() admin.SetDeductionRequest {
+	return admin.SetDeductionRequest{
+		Type:   admin.Personal,
+		Amount: r.Amount,
+	}
 }

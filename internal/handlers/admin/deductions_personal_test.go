@@ -9,20 +9,26 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/ztrixack/assessment-tax/internal/modules/api"
 	"github.com/ztrixack/assessment-tax/internal/modules/logger"
+	"github.com/ztrixack/assessment-tax/internal/services/admin"
 )
 
 func TestDeductionsPersonalRequest(t *testing.T) {
 	tests := []struct {
 		name         string
+		mockBehavior func(*admin.MockService)
 		contentType  string
 		request      DeductionsPersonalRequest
 		expected     DeductionsPersonalResponse
 		expectedCode int
 	}{
 		{
-			name:        "Story: EXP05",
+			name: "Story: EXP05",
+			mockBehavior: func(ms *admin.MockService) {
+				ms.On("SetDeduction", mock.Anything, mock.Anything).Return(70000.0, nil)
+			},
 			contentType: "application/json",
 			request: DeductionsPersonalRequest{
 				Amount: 70000.0,
@@ -33,7 +39,10 @@ func TestDeductionsPersonalRequest(t *testing.T) {
 			expectedCode: http.StatusOK,
 		},
 		{
-			name:        "Normal case",
+			name: "Normal case",
+			mockBehavior: func(ms *admin.MockService) {
+				ms.On("SetDeduction", mock.Anything, mock.Anything).Return(50000.0, nil)
+			},
 			contentType: "application/json",
 			request: DeductionsPersonalRequest{
 				Amount: 50000.0,
@@ -45,12 +54,14 @@ func TestDeductionsPersonalRequest(t *testing.T) {
 		},
 		{
 			name:         "Request parameters are invalid on Bind",
+			mockBehavior: func(ms *admin.MockService) {},
 			contentType:  "text/plain",
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:        "Request parameters are invalid on Validate",
-			contentType: "application/json",
+			name:         "Request parameters are invalid on Validate",
+			mockBehavior: func(ms *admin.MockService) {},
+			contentType:  "application/json",
 			request: DeductionsPersonalRequest{
 				Amount: -70000.0,
 			},
@@ -74,8 +85,10 @@ func TestDeductionsPersonalRequest(t *testing.T) {
 			defer res.Body.Close()
 
 			log := logger.NewMockLogger()
-			h := New(log, server)
+			ms := new(admin.MockService)
+			h := New(log, server, ms)
 
+			tt.mockBehavior(ms)
 			err = h.DeductionsPersonal(c)
 
 			assert.NoError(t, err)
@@ -87,6 +100,8 @@ func TestDeductionsPersonalRequest(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Equal(t, tt.expected, result)
 			}
+
+			ms.AssertExpectations(t)
 		})
 	}
 }
@@ -143,6 +158,32 @@ func TestDeductionsPersonalRequest_Validation(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
+		})
+	}
+}
+
+func TestDeductionsPersonalRequest_ToServiceRequest(t *testing.T) {
+	tests := []struct {
+		name     string
+		request  DeductionsPersonalRequest
+		expected admin.SetDeductionRequest
+	}{
+		{
+			name: "valid request",
+			request: DeductionsPersonalRequest{
+				Amount: 50000.0,
+			},
+			expected: admin.SetDeductionRequest{
+				Type:   "personal",
+				Amount: 50000.0,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.request.toServiceRequest()
+			assert.Equal(t, tt.expected, result)
 		})
 	}
 }
