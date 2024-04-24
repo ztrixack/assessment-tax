@@ -41,6 +41,11 @@ const docTemplate = `{
         },
         "/admin/deductions/personal": {
             "post": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
                 "description": "Sets the personal deduction based on the provided request parameters.",
                 "consumes": [
                     "application/json"
@@ -72,6 +77,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad request if the input validation fails",
+                        "schema": {
+                            "$ref": "#/definitions/admin.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/admin.ErrorResponse"
                         }
@@ -236,6 +247,11 @@ const docTemplate = `{
                     "type": "number"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BasicAuth": {
+            "type": "basic"
         }
     }
 }`

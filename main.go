@@ -15,15 +15,16 @@ import (
 	_ "github.com/ztrixack/assessment-tax/docs"
 )
 
-// @title			Assessment Tax API
-// @version		1.0
-// @description	Assessment Tax API for Go Bootcamp
+//	@title						Assessment Tax API
+//	@version					1.0
+//	@description				Assessment Tax API for Go Bootcamp
 //
-// @contact.name	Tanawat Hongthai
-// @contact.url	https://github.com/ztrixack/assessment-tax.git
-// @contact.email	ztrixack.th@gmail.com
+//	@contact.name				Tanawat Hongthai
+//	@contact.url				https://github.com/ztrixack/assessment-tax.git
+//	@contact.email				ztrixack.th@gmail.com
 //
-// @schemes		http
+//	@schemes					http
+//	@securityDefinitions.basic	BasicAuth
 func main() {
 	// modules
 	log := logger.NewZerolog(logger.Config())

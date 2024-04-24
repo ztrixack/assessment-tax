@@ -29,10 +29,12 @@ type ErrorResponse struct {
 //	@tags			admin/deductions
 //	@accept			json
 //	@produce		json
-//	@param			request	body		DeductionsPersonalRequest	true	"Input request for setting personal deduction"
-//	@success		200		{object}	DeductionsPersonalResponse	"Successfully response with updated deduction details"
-//	@failure		400		{object}	ErrorResponse				"Bad request if the input validation fails"
-//	@failure		500		{object}	ErrorResponse				"Internal Server Error if there is a problem setting the deduction"
+//	@param			request	body	DeductionsPersonalRequest	true	"Input request for setting personal deduction"
+//	@security		BasicAuth
+//	@success		200	{object}	DeductionsPersonalResponse	"Successfully response with updated deduction details"
+//	@failure		400	{object}	ErrorResponse				"Bad request if the input validation fails"
+//	@failure		401	{object}	ErrorResponse				"Unauthorized"
+//	@failure		500	{object}	ErrorResponse				"Internal Server Error if there is a problem setting the deduction"
 //	@router			/admin/deductions/personal [post]
 func (h handler) DeductionsPersonal(c api.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)

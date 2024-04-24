@@ -114,10 +114,16 @@ paths:
           description: Bad request if the input validation fails
           schema:
             $ref: '#/definitions/admin.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/admin.ErrorResponse'
         "500":
           description: Internal Server Error if there is a problem setting the deduction
           schema:
             $ref: '#/definitions/admin.ErrorResponse'
+      security:
+      - BasicAuth: []
       summary: Set personal deduction
       tags:
       - admin/deductions
@@ -155,4 +161,7 @@ paths:
       - tax
 schemes:
 - http
+securityDefinitions:
+  BasicAuth:
+    type: basic
 swagger: "2.0"
