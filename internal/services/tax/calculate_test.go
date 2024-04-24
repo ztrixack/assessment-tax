@@ -35,12 +35,36 @@ func TestCalculate(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "Normal case",
+			request: CalculateRequest{
+				Income:     1000000.0,
+				Allowances: []Allowance{},
+			},
+			mockBehavior: defaultMockBehavior,
+			expectedResult: &CalculateResponse{
+				Tax: 101000.0,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Income is lower than all allowances",
+			request: CalculateRequest{
+				Income:     50000.0,
+				Allowances: []Allowance{},
+			},
+			mockBehavior: defaultMockBehavior,
+			expectedResult: &CalculateResponse{
+				Tax: 0.0,
+			},
+			wantErr: false,
+		},
+		{
 			name: "error in tax calculation",
 			request: CalculateRequest{
 				Income:     -1,
 				Allowances: []Allowance{},
 			},
-			mockBehavior:   defaultMockBehavior,
+			mockBehavior:   func(mock sqlmock.Sqlmock) {},
 			expectedResult: nil,
 			wantErr:        true,
 		},

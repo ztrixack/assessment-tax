@@ -13,12 +13,17 @@ type CalculateResponse struct {
 }
 
 func (s *service) Calculate(ctx context.Context, req CalculateRequest) (*CalculateResponse, error) {
+	if req.Income < 0 {
+		return nil, ErrNegativeIncome
+	}
+
 	totalAllowances, err := s.calculateAllowances(req.Allowances)
 	if err != nil {
 		return nil, err
 	}
 
-	result, err := calculateProgressiveTax(req.Income - totalAllowances)
+	netIncome := max(req.Income-totalAllowances, 0)
+	result, err := calculateProgressiveTax(netIncome)
 	if err != nil {
 		return nil, err
 	}
