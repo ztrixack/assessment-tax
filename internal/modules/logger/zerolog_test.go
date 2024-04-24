@@ -7,8 +7,9 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
-	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func setup() (*bytes.Buffer, *zerologLogger) {
@@ -81,12 +82,8 @@ func TestFields(t *testing.T) {
 	extendedLogger.logger.Info().Msg("testing fields")
 
 	output := buffer.String()
-	if !strings.Contains(output, expectedUserField) {
-		t.Errorf("expected '%s' included but got '%s'", expectedUserField, output)
-	}
-	if !strings.Contains(output, expectedIdField) {
-		t.Errorf("expected '%s' included but got '%s'", expectedIdField, output)
-	}
+	assert.Contains(t, output, expectedUserField)
+	assert.Contains(t, output, expectedIdField)
 }
 
 func TestErr(t *testing.T) {
@@ -98,7 +95,5 @@ func TestErr(t *testing.T) {
 	errorLogger.logger.Error().Msg("error occurred")
 
 	output := buffer.String()
-	if !strings.Contains(output, expectedError) {
-		t.Errorf("expected '%s' included but got '%s'", expectedError, output)
-	}
+	assert.Contains(t, output, expectedError)
 }

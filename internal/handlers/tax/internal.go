@@ -9,6 +9,7 @@ import (
 
 	"github.com/ztrixack/assessment-tax/internal/modules/api"
 	"github.com/ztrixack/assessment-tax/internal/services/tax"
+	"github.com/ztrixack/assessment-tax/internal/utils/constants"
 	"github.com/ztrixack/assessment-tax/internal/utils/csv"
 )
 
@@ -18,7 +19,7 @@ var (
 	ErrInvalidFile    = fmt.Errorf("invalid file")
 	ErrGetFileFailed  = fmt.Errorf("failed to get CSV file")
 
-	TaxLevelLabels = []string{"0-150,000", "150,001-500,000", "500,001-1,000,000", "1,000,001-2,000,000", "2,000,001 ขึ้นไป"}
+	TaxLevelLabels = []string{constants.T0_150k, constants.T150k_500k, constants.T500k_1M, constants.T1M_2M, constants.T2M}
 )
 
 type ErrorResponse struct {

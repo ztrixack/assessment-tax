@@ -34,8 +34,8 @@ func (p *postgresDB) Close() error {
 	return p.db.Close()
 }
 
-func (p *postgresDB) Query(query_ string, args ...interface{}) (*sql.Rows, error) {
-	return query(p.db, query_, args...)
+func (p *postgresDB) Query(qry string, args ...interface{}) (*sql.Rows, error) {
+	return query(p.db, qry, args...)
 }
 
 func (p *postgresDB) QueryOne(query string, args ...interface{}) (*sql.Row, error) {

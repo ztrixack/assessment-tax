@@ -13,6 +13,7 @@ import (
 	"github.com/ztrixack/assessment-tax/internal/modules/api"
 	"github.com/ztrixack/assessment-tax/internal/modules/logger"
 	"github.com/ztrixack/assessment-tax/internal/services/admin"
+	"github.com/ztrixack/assessment-tax/internal/utils/constants"
 )
 
 func TestDeductionsKReceiptRequest(t *testing.T) {
@@ -29,7 +30,7 @@ func TestDeductionsKReceiptRequest(t *testing.T) {
 			mockBehavior: func(ms *admin.MockService) {
 				ms.On("SetDeduction", mock.Anything, mock.Anything).Return(70000.0, nil)
 			},
-			contentType: "application/json",
+			contentType: constants.APPLICATION_JSON,
 			request: DeductionsKReceiptRequest{
 				Amount: 70000.0,
 			},
@@ -43,7 +44,7 @@ func TestDeductionsKReceiptRequest(t *testing.T) {
 			mockBehavior: func(ms *admin.MockService) {
 				ms.On("SetDeduction", mock.Anything, mock.Anything).Return(50000.0, nil)
 			},
-			contentType: "application/json",
+			contentType: constants.APPLICATION_JSON,
 			request: DeductionsKReceiptRequest{
 				Amount: 50000.0,
 			},
@@ -53,15 +54,19 @@ func TestDeductionsKReceiptRequest(t *testing.T) {
 			expectedCode: http.StatusOK,
 		},
 		{
-			name:         "Request parameters are invalid on Bind",
-			mockBehavior: func(ms *admin.MockService) {},
-			contentType:  "text/plain",
+			name: "Request parameters are invalid on Bind",
+			mockBehavior: func(ms *admin.MockService) {
+				// Do nothing
+			},
+			contentType:  constants.TEXT_PLAIN,
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:         "Request parameters are invalid on Validate",
-			mockBehavior: func(ms *admin.MockService) {},
-			contentType:  "application/json",
+			name: "Request parameters are invalid on Validate",
+			mockBehavior: func(ms *admin.MockService) {
+				// Do nothing
+			},
+			contentType: constants.APPLICATION_JSON,
 			request: DeductionsKReceiptRequest{
 				Amount: -70000.0,
 			},
@@ -106,7 +111,7 @@ func TestDeductionsKReceiptRequest(t *testing.T) {
 	}
 }
 
-func TestDeductionsKReceiptRequest_Validation(t *testing.T) {
+func TestDeductionsKReceiptRequestValidation(t *testing.T) {
 	tests := []struct {
 		name    string
 		request DeductionsKReceiptRequest
@@ -162,7 +167,7 @@ func TestDeductionsKReceiptRequest_Validation(t *testing.T) {
 	}
 }
 
-func TestDeductionsKReceiptRequest_ToServiceRequest(t *testing.T) {
+func TestDeductionsKReceiptRequestToServiceRequest(t *testing.T) {
 	tests := []struct {
 		name     string
 		request  DeductionsKReceiptRequest

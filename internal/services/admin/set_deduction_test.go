@@ -52,27 +52,35 @@ func TestSetDeduction(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			name:          "Set Personal deduction less than 10,000",
-			request:       SetDeductionRequest{Type: Personal, Amount: 9999.0},
-			mockBehaviour: func() {},
+			name:    "Set Personal deduction less than 10,000",
+			request: SetDeductionRequest{Type: Personal, Amount: 9999.0},
+			mockBehaviour: func() {
+				// Do nothing
+			},
 			expectedError: ErrLessThanLimit(Personal, PersonalMinimum),
 		},
 		{
-			name:          "Set Personal deduction more than 100,000",
-			request:       SetDeductionRequest{Type: Personal, Amount: 100001.0},
-			mockBehaviour: func() {},
+			name:    "Set Personal deduction more than 100,000",
+			request: SetDeductionRequest{Type: Personal, Amount: 100001.0},
+			mockBehaviour: func() {
+				// Do nothing
+			},
 			expectedError: ErrMoreThanLimit(Personal, PersonalMaximum),
 		},
 		{
-			name:          "Set K-Receipt deduction less than 0",
-			request:       SetDeductionRequest{Type: KReceipt, Amount: -1.0},
-			mockBehaviour: func() {},
+			name:    "Set K-Receipt deduction less than 0",
+			request: SetDeductionRequest{Type: KReceipt, Amount: -1.0},
+			mockBehaviour: func() {
+				// Do nothing
+			},
 			expectedError: ErrLessThanLimit(KReceipt, KReceiptMinimum),
 		},
 		{
-			name:          "Set K-Receipt deduction more than 100,000",
-			request:       SetDeductionRequest{Type: KReceipt, Amount: 100001.0},
-			mockBehaviour: func() {},
+			name:    "Set K-Receipt deduction more than 100,000",
+			request: SetDeductionRequest{Type: KReceipt, Amount: 100001.0},
+			mockBehaviour: func() {
+				// Do nothing
+			},
 			expectedError: ErrMoreThanLimit(KReceipt, KReceiptMaximum),
 		},
 		{
@@ -87,9 +95,11 @@ func TestSetDeduction(t *testing.T) {
 			expectedError: ErrUpdateDatabase(Personal),
 		},
 		{
-			name:          "Unknown Type",
-			request:       SetDeductionRequest{Type: "unknown", Amount: 60000.0},
-			mockBehaviour: func() {},
+			name:    "Unknown Type",
+			request: SetDeductionRequest{Type: "unknown", Amount: 60000.0},
+			mockBehaviour: func() {
+				// Do nothing
+			},
 			expectedError: ErrInvalidDeductionType,
 		},
 	}

@@ -1,0 +1,6 @@
+projectKey=assessment-tax
+serverUrl=http://localhost:9000
+serverVersion=10.5.0.89998
+dashboardUrl=http://localhost:9000/dashboard?id=assessment-tax
+ceTaskId=3d74425e-48f7-478e-9fbe-7c58923249a8
+ceTaskUrl=http://localhost:9000/api/ce/task?id=3d74425e-48f7-478e-9fbe-7c58923249a8

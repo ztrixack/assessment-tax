@@ -25,14 +25,14 @@ const (
 
 var (
 	ErrInvalidDeductionType = fmt.Errorf("invalid deduction type")
-	ErrLessThanLimit        = func(type_ DeductionType, value float64) error {
-		return fmt.Errorf("the %s deduction cannot be less than %f", type_, value)
+	ErrLessThanLimit        = func(dtype DeductionType, value float64) error {
+		return fmt.Errorf("the %s deduction cannot be less than %f", dtype, value)
 	}
-	ErrMoreThanLimit = func(type_ DeductionType, value float64) error {
-		return fmt.Errorf("the %s deduction cannot be more than %f", type_, value)
+	ErrMoreThanLimit = func(dtype DeductionType, value float64) error {
+		return fmt.Errorf("the %s deduction cannot be more than %f", dtype, value)
 	}
-	ErrUpdateDatabase = func(type_ DeductionType) error {
-		return fmt.Errorf("failed to set %s deduction", type_)
+	ErrUpdateDatabase = func(dtype DeductionType) error {
+		return fmt.Errorf("failed to set %s deduction", dtype)
 	}
 )
 
@@ -48,21 +48,21 @@ func (r SetDeductionRequest) validate() error {
 	return ErrInvalidDeductionType
 }
 
-func limiter(type_ DeductionType, amount, lower, upper float64) error {
+func limiter(dtype DeductionType, amount, lower, upper float64) error {
 	if amount < lower {
-		return ErrLessThanLimit(type_, lower)
+		return ErrLessThanLimit(dtype, lower)
 	}
 
 	if amount > upper {
-		return ErrMoreThanLimit(type_, upper)
+		return ErrMoreThanLimit(dtype, upper)
 	}
 
 	return nil
 }
 
-func sanitizeType(type_ DeductionType) string {
-	sanitized := make([]rune, len(type_))
-	for i, r := range type_ {
+func sanitizeType(dtype DeductionType) string {
+	sanitized := make([]rune, len(dtype))
+	for i, r := range dtype {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) {
 			sanitized[i] = r
 		} else {

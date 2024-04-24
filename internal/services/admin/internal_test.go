@@ -36,7 +36,7 @@ func TestValidate(t *testing.T) {
 func TestLimiter(t *testing.T) {
 	tests := []struct {
 		name    string
-		type_   DeductionType
+		dtype   DeductionType
 		amount  float64
 		lower   float64
 		upper   float64
@@ -52,7 +52,7 @@ func TestLimiter(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			err := limiter(tc.type_, tc.amount, tc.lower, tc.upper)
+			err := limiter(tc.dtype, tc.amount, tc.lower, tc.upper)
 			if tc.wantErr {
 				assert.Error(t, err)
 			} else {
@@ -65,7 +65,7 @@ func TestLimiter(t *testing.T) {
 func TestSanitizeType(t *testing.T) {
 	tests := []struct {
 		name      string
-		type_     DeductionType
+		dtype     DeductionType
 		wantValue string
 	}{
 		{"Map personal", Personal, "personal"},
@@ -77,7 +77,7 @@ func TestSanitizeType(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			assert.Equal(t, tc.wantValue, sanitizeType(tc.type_))
+			assert.Equal(t, tc.wantValue, sanitizeType(tc.dtype))
 		})
 	}
 }

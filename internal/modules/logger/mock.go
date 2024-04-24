@@ -17,18 +17,23 @@ func (l *MockLog) Config() config {
 }
 
 func (l *MockLog) D(format string, args ...interface{}) {
+	// Do nothing
 }
 
 func (l *MockLog) I(format string, args ...interface{}) {
+	// Do nothing
 }
 
 func (l *MockLog) W(format string, args ...interface{}) {
+	// Do nothing
 }
 
 func (l *MockLog) E(format string, args ...interface{}) {
+	// Do nothing
 }
 
 func (l *MockLog) C(format string, args ...interface{}) {
+	// Do nothing
 }
 
 func (l *MockLog) Fields(fields Fields) Logger {
