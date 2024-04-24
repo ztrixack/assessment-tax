@@ -47,3 +47,46 @@ func TestToResponse(t *testing.T) {
 		})
 	}
 }
+
+func TestRemapAllowances(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    []Allowance
+		expected []tax.Allowance
+	}{
+		{
+			name:     "empty input",
+			input:    []Allowance{},
+			expected: []tax.Allowance{},
+		},
+		{
+			name: "single element",
+			input: []Allowance{
+				{AllowanceType: "donation", Amount: 1000},
+			},
+			expected: []tax.Allowance{
+				{Type: tax.AllowanceType("donation"), Amount: 1000},
+			},
+		},
+		{
+			name: "multiple elements",
+			input: []Allowance{
+				{AllowanceType: "donation", Amount: 1000},
+				{AllowanceType: "donation", Amount: 100000},
+				{AllowanceType: "unknown", Amount: 300},
+			},
+			expected: []tax.Allowance{
+				{Type: tax.AllowanceType("donation"), Amount: 1000},
+				{Type: tax.AllowanceType("donation"), Amount: 100000},
+				{Type: tax.AllowanceType("unknown"), Amount: 300},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := remapAllowances(tt.input)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
