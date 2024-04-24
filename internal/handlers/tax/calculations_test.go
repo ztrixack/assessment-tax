@@ -62,6 +62,22 @@ func TestCalculations(t *testing.T) {
 			expectedCode: http.StatusOK,
 		},
 		{
+			name: "Story: EXP03",
+			mockBehavior: func(ms *tax.MockService) {
+				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 19000.0}, nil)
+			},
+			contentType: "application/json",
+			request: CalculationsRequest{
+				TotalIncome: 500000.0,
+				WHT:         0.0,
+				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 200000.0}},
+			},
+			expected: CalculationsResponse{
+				Tax: 19000.0,
+			},
+			expectedCode: http.StatusOK,
+		},
+		{
 			name: "Successful calculation",
 			mockBehavior: func(ms *tax.MockService) {
 				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 90000.0}, nil)
