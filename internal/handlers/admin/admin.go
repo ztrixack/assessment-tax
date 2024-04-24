@@ -20,4 +20,5 @@ func New(log logger.Logger, e api.API, admin admin.Servicer) *handler {
 
 func (h handler) setupRoutes(r api.Router) {
 	r.POST("/admin/deductions/personal", h.DeductionsPersonal, middlewares.BasicAuth(h.log))
+	r.POST("/admin/deductions/k-receipt", h.DeductionsKReceipt, middlewares.BasicAuth(h.log))
 }

@@ -41,6 +41,17 @@ func TestSetDeduction(t *testing.T) {
 			expectedError: nil,
 		},
 		{
+			name:    "Successful to set k-receipt update",
+			request: SetDeductionRequest{Type: KReceipt, Amount: 60000.0},
+			mockBehaviour: func() {
+				mock.ExpectPrepare("UPDATE allowances SET k_receipt = \\$1").
+					ExpectExec().
+					WithArgs(60000.0).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+			},
+			expectedError: nil,
+		},
+		{
 			name:          "Set Personal deduction less than 10,000",
 			request:       SetDeductionRequest{Type: Personal, Amount: 9999.0},
 			mockBehaviour: func() {},
@@ -51,6 +62,18 @@ func TestSetDeduction(t *testing.T) {
 			request:       SetDeductionRequest{Type: Personal, Amount: 100001.0},
 			mockBehaviour: func() {},
 			expectedError: ErrMoreThanLimit(Personal, PersonalMaximum),
+		},
+		{
+			name:          "Set K-Receipt deduction less than 0",
+			request:       SetDeductionRequest{Type: KReceipt, Amount: -1.0},
+			mockBehaviour: func() {},
+			expectedError: ErrLessThanLimit(KReceipt, KReceiptMinimum),
+		},
+		{
+			name:          "Set K-Receipt deduction more than 100,000",
+			request:       SetDeductionRequest{Type: KReceipt, Amount: 100001.0},
+			mockBehaviour: func() {},
+			expectedError: ErrMoreThanLimit(KReceipt, KReceiptMaximum),
 		},
 		{
 			name:    "Database error",

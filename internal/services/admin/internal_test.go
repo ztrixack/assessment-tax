@@ -18,6 +18,9 @@ func TestLimiter(t *testing.T) {
 		{"Valid Personal Deduction", Personal, 50000, PersonalMinimum, PersonalMaximum, false},
 		{"Too Low Personal Deduction", Personal, 9999, PersonalMinimum, PersonalMaximum, true},
 		{"Too High Personal Deduction", Personal, 100001, PersonalMinimum, PersonalMaximum, true},
+		{"Valid K-Receipt Deduction", KReceipt, 50000, KReceiptMinimum, KReceiptMaximum, false},
+		{"Too Low K-Receipt Deduction", KReceipt, -1, KReceiptMinimum, KReceiptMaximum, true},
+		{"Too High K-Receipt Deduction", KReceipt, 100001, KReceiptMinimum, KReceiptMaximum, true},
 	}
 
 	for _, tc := range tests {

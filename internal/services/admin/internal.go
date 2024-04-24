@@ -13,9 +13,13 @@ type DeductionType string
 
 const (
 	Personal DeductionType = "personal"
+	KReceipt DeductionType = "k-receipt"
 
 	PersonalMinimum = 10000
 	PersonalMaximum = 100000
+
+	KReceiptMinimum = 0
+	KReceiptMaximum = 100000
 )
 
 var (
