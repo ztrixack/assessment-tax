@@ -1,16 +1,27 @@
 package tax
 
 import (
+	"context"
 	"net/http"
+	"time"
 
 	"github.com/ztrixack/assessment-tax/internal/modules/api"
 	"github.com/ztrixack/assessment-tax/internal/modules/logger"
+	"github.com/ztrixack/assessment-tax/internal/services/tax"
 )
 
 type CalculationsRequest struct {
 	TotalIncome float64     `json:"totalIncome" validate:"min=0" example:"500000.0"`
 	WHT         float64     `json:"wht" validate:"min=0" example:"0.0"`
 	Allowances  []Allowance `json:"allowances" validate:"dive"`
+}
+
+func (r *CalculationsRequest) toServiceRequest() tax.CalculateRequest {
+	return tax.CalculateRequest{
+		Income:     r.TotalIncome,
+		WHT:        r.WHT,
+		Allowances: []tax.Allowance{},
+	}
 }
 
 type Allowance struct {
@@ -24,6 +35,9 @@ type CalculationsResponse struct {
 }
 
 func (h *handler) Calculations(c api.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
 	var req CalculationsRequest
 	if err := c.Bind(&req); err != nil {
 		h.log.Err(err).E("Failed to bind request")
@@ -35,13 +49,7 @@ func (h *handler) Calculations(c api.Context) error {
 		return c.JSON(http.StatusBadRequest, ErrInvalidRequest)
 	}
 
-	res := h.calculateTax(req)
+	res := h.tax.Calculate(ctx, req.toServiceRequest())
 
-	return c.JSON(http.StatusOK, res)
-}
-
-func (h *handler) calculateTax(_ CalculationsRequest) CalculationsResponse {
-	return CalculationsResponse{
-		Tax: 29000,
-	}
+	return c.JSON(http.StatusOK, toResponse(*res))
 }

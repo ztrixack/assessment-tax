@@ -9,20 +9,26 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/ztrixack/assessment-tax/internal/modules/api"
 	"github.com/ztrixack/assessment-tax/internal/modules/logger"
+	"github.com/ztrixack/assessment-tax/internal/services/tax"
 )
 
 func TestCalculations(t *testing.T) {
 	tests := []struct {
 		name         string
+		mockBehavior func(*tax.MockService)
 		contentType  string
 		request      CalculationsRequest
 		expected     CalculationsResponse
 		expectedCode int
 	}{
 		{
-			name:        "Story: EXP01",
+			name: "Story: EXP01",
+			mockBehavior: func(ms *tax.MockService) {
+				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 29000.0})
+			},
 			contentType: "application/json",
 			request: CalculationsRequest{
 				TotalIncome: 500000.0,
@@ -35,30 +41,33 @@ func TestCalculations(t *testing.T) {
 			expectedCode: http.StatusOK,
 		},
 		{
-			name:        "Successful calculation",
+			name: "Successful calculation",
+			mockBehavior: func(ms *tax.MockService) {
+				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 90000.0})
+			},
 			contentType: "application/json",
 			request: CalculationsRequest{
-				TotalIncome: 500000.0,
+				TotalIncome: 1500000.0,
 				WHT:         0.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0.0}},
 			},
 			expected: CalculationsResponse{
-				Tax: 29000.0,
+				Tax: 90000.0,
 			},
 			expectedCode: http.StatusOK,
 		},
 		{
 			name:         "Request parameters are invalid on Bind",
+			mockBehavior: func(ms *tax.MockService) {},
 			contentType:  "text/plain",
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:        "Request parameters are invalid on Validate",
-			contentType: "application/json",
+			name:         "Request parameters are invalid on Validate",
+			mockBehavior: func(ms *tax.MockService) {},
+			contentType:  "application/json",
 			request: CalculationsRequest{
-				TotalIncome: 500000.0,
-				WHT:         -1000,
-				Allowances:  []Allowance{},
+				TotalIncome: -500000.0,
 			},
 			expectedCode: http.StatusBadRequest,
 		},
@@ -80,8 +89,10 @@ func TestCalculations(t *testing.T) {
 			defer res.Body.Close()
 
 			log := logger.NewMockLogger()
-			h := New(log, server)
+			ms := new(tax.MockService)
+			h := New(log, server, ms)
 
+			tt.mockBehavior(ms)
 			err = h.Calculations(c)
 
 			assert.NoError(t, err)
@@ -93,6 +104,8 @@ func TestCalculations(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Equal(t, tt.expected, result)
 			}
+
+			ms.AssertExpectations(t)
 		})
 	}
 }
