@@ -11,7 +11,7 @@ import (
 )
 
 type DeductionsPersonalRequest struct {
-	Amount float64 `json:"amount" validate:"min=10000,max=100000" example:"0.0"`
+	Amount float64 `json:"amount" validate:"min=10000,max=100000" example:"60000.0"`
 }
 
 type DeductionsPersonalResponse struct {
@@ -22,6 +22,18 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
+// DeductionsPersonal sets a personal deduction by admin.
+//
+//	@summary		Set personal deduction
+//	@description	Sets the personal deduction based on the provided request parameters.
+//	@tags			admin/deductions
+//	@accept			json
+//	@produce		json
+//	@param			request	body		DeductionsPersonalRequest	true	"Input request for setting personal deduction"
+//	@success		200		{object}	DeductionsPersonalResponse	"Successfully response with updated deduction details"
+//	@failure		400		{object}	ErrorResponse				"Bad request if the input validation fails"
+//	@failure		500		{object}	ErrorResponse				"Internal Server Error if there is a problem setting the deduction"
+//	@router			/admin/deductions/personal [post]
 func (h handler) DeductionsPersonal(c api.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
