@@ -14,6 +14,7 @@ import (
 	"github.com/ztrixack/assessment-tax/internal/modules/api"
 	"github.com/ztrixack/assessment-tax/internal/modules/logger"
 	"github.com/ztrixack/assessment-tax/internal/services/tax"
+	"github.com/ztrixack/assessment-tax/internal/utils/constants"
 )
 
 func TestCalculations(t *testing.T) {
@@ -34,7 +35,7 @@ func TestCalculations(t *testing.T) {
 			mockBehavior: func(ms *tax.MockService) {
 				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 29000.0, Refund: 0.0, TaxLevel: []float64{0.0, 29000.0, 0.0, 0.0, 0.0}}, nil)
 			},
-			contentType: "application/json",
+			contentType: constants.APPLICATION_JSON,
 			request: CalculationsRequest{
 				TotalIncome: 500000.0,
 				WHT:         0.0,
@@ -42,7 +43,7 @@ func TestCalculations(t *testing.T) {
 			},
 			expected: CalculationsResponse{
 				Tax:      29000.0,
-				TaxLevel: []TaxLevel{{"0-150,000", 0.0}, {"150,001-500,000", 29000.0}, {"500,001-1,000,000", 0.0}, {"1,000,001-2,000,000", 0.0}, {"2,000,001 ขึ้นไป", 0.0}},
+				TaxLevel: []TaxLevel{{constants.T0_150k, 0.0}, {constants.T150k_500k, 29000.0}, {constants.T500k_1M, 0.0}, {constants.T1M_2M, 0.0}, {constants.T2M, 0.0}},
 			},
 			expectedCode: http.StatusOK,
 		},
@@ -51,7 +52,7 @@ func TestCalculations(t *testing.T) {
 			mockBehavior: func(ms *tax.MockService) {
 				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 4000.0, Refund: 0.0, TaxLevel: []float64{0.0, 29000.0, 0.0, 0.0, 0.0}}, nil)
 			},
-			contentType: "application/json",
+			contentType: constants.APPLICATION_JSON,
 			request: CalculationsRequest{
 				TotalIncome: 500000.0,
 				WHT:         25000.0,
@@ -59,7 +60,7 @@ func TestCalculations(t *testing.T) {
 			},
 			expected: CalculationsResponse{
 				Tax:      4000.0,
-				TaxLevel: []TaxLevel{{"0-150,000", 0.0}, {"150,001-500,000", 29000.0}, {"500,001-1,000,000", 0.0}, {"1,000,001-2,000,000", 0.0}, {"2,000,001 ขึ้นไป", 0.0}},
+				TaxLevel: []TaxLevel{{constants.T0_150k, 0.0}, {constants.T150k_500k, 29000.0}, {constants.T500k_1M, 0.0}, {constants.T1M_2M, 0.0}, {constants.T2M, 0.0}},
 			},
 			expectedCode: http.StatusOK,
 		},
@@ -68,7 +69,7 @@ func TestCalculations(t *testing.T) {
 			mockBehavior: func(ms *tax.MockService) {
 				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 19000.0, Refund: 0.0, TaxLevel: []float64{0.0, 19000.0, 0.0, 0.0, 0.0}}, nil)
 			},
-			contentType: "application/json",
+			contentType: constants.APPLICATION_JSON,
 			request: CalculationsRequest{
 				TotalIncome: 500000.0,
 				WHT:         0.0,
@@ -76,7 +77,7 @@ func TestCalculations(t *testing.T) {
 			},
 			expected: CalculationsResponse{
 				Tax:      19000.0,
-				TaxLevel: []TaxLevel{{"0-150,000", 0.0}, {"150,001-500,000", 19000.0}, {"500,001-1,000,000", 0.0}, {"1,000,001-2,000,000", 0.0}, {"2,000,001 ขึ้นไป", 0.0}},
+				TaxLevel: []TaxLevel{{constants.T0_150k, 0.0}, {constants.T150k_500k, 19000.0}, {constants.T500k_1M, 0.0}, {constants.T1M_2M, 0.0}, {constants.T2M, 0.0}},
 			},
 			expectedCode: http.StatusOK,
 		},
@@ -85,7 +86,7 @@ func TestCalculations(t *testing.T) {
 			mockBehavior: func(ms *tax.MockService) {
 				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 19000.0, Refund: 0.0, TaxLevel: []float64{0.0, 19000.0, 0.0, 0.0, 0.0}}, nil)
 			},
-			contentType: "application/json",
+			contentType: constants.APPLICATION_JSON,
 			request: CalculationsRequest{
 				TotalIncome: 500000.0,
 				WHT:         0.0,
@@ -93,7 +94,7 @@ func TestCalculations(t *testing.T) {
 			},
 			expected: CalculationsResponse{
 				Tax:      19000.0,
-				TaxLevel: []TaxLevel{{"0-150,000", 0.0}, {"150,001-500,000", 19000.0}, {"500,001-1,000,000", 0.0}, {"1,000,001-2,000,000", 0.0}, {"2,000,001 ขึ้นไป", 0.0}},
+				TaxLevel: []TaxLevel{{constants.T0_150k, 0.0}, {constants.T150k_500k, 19000.0}, {constants.T500k_1M, 0.0}, {constants.T1M_2M, 0.0}, {constants.T2M, 0.0}},
 			},
 			expectedCode: http.StatusOK,
 		},
@@ -102,7 +103,7 @@ func TestCalculations(t *testing.T) {
 			mockBehavior: func(ms *tax.MockService) {
 				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 14000.0, Refund: 0.0, TaxLevel: []float64{0.0, 14000.0, 0.0, 0.0, 0.0}}, nil)
 			},
-			contentType: "application/json",
+			contentType: constants.APPLICATION_JSON,
 			request: CalculationsRequest{
 				TotalIncome: 500000.0,
 				WHT:         0.0,
@@ -110,7 +111,7 @@ func TestCalculations(t *testing.T) {
 			},
 			expected: CalculationsResponse{
 				Tax:      14000.0,
-				TaxLevel: []TaxLevel{{"0-150,000", 0.0}, {"150,001-500,000", 14000.0}, {"500,001-1,000,000", 0.0}, {"1,000,001-2,000,000", 0.0}, {"2,000,001 ขึ้นไป", 0.0}},
+				TaxLevel: []TaxLevel{{constants.T0_150k, 0.0}, {constants.T150k_500k, 14000.0}, {constants.T500k_1M, 0.0}, {constants.T1M_2M, 0.0}, {constants.T2M, 0.0}},
 			},
 			expectedCode: http.StatusOK,
 		},
@@ -119,7 +120,7 @@ func TestCalculations(t *testing.T) {
 			mockBehavior: func(ms *tax.MockService) {
 				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 1360000.0, Refund: 0.0, TaxLevel: []float64{0.0, 35000.0, 75000.0, 200000.0, 1050000.0}}, nil)
 			},
-			contentType: "application/json",
+			contentType: constants.APPLICATION_JSON,
 			request: CalculationsRequest{
 				TotalIncome: 5000000.0,
 				WHT:         0.0,
@@ -127,7 +128,7 @@ func TestCalculations(t *testing.T) {
 			},
 			expected: CalculationsResponse{
 				Tax:      1360000.0,
-				TaxLevel: []TaxLevel{{"0-150,000", 0.0}, {"150,001-500,000", 35000.0}, {"500,001-1,000,000", 75000.0}, {"1,000,001-2,000,000", 200000.0}, {"2,000,001 ขึ้นไป", 1050000.0}},
+				TaxLevel: []TaxLevel{{constants.T0_150k, 0.0}, {constants.T150k_500k, 35000.0}, {constants.T500k_1M, 75000.0}, {constants.T1M_2M, 200000.0}, {constants.T2M, 1050000.0}},
 			},
 			expectedCode: http.StatusOK,
 		},
@@ -136,7 +137,7 @@ func TestCalculations(t *testing.T) {
 			mockBehavior: func(ms *tax.MockService) {
 				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 0.0, Refund: 21000.0, TaxLevel: []float64{0.0, 29000.0, 0.0, 0.0, 0.0}}, nil)
 			},
-			contentType: "application/json",
+			contentType: constants.APPLICATION_JSON,
 			request: CalculationsRequest{
 				TotalIncome: 500000.0,
 				WHT:         50000.0,
@@ -145,20 +146,24 @@ func TestCalculations(t *testing.T) {
 			expected: CalculationsResponse{
 				Tax:       0.0,
 				TaxRefund: pointerTo(21000.0),
-				TaxLevel:  []TaxLevel{{"0-150,000", 0.0}, {"150,001-500,000", 29000.0}, {"500,001-1,000,000", 0.0}, {"1,000,001-2,000,000", 0.0}, {"2,000,001 ขึ้นไป", 0.0}},
+				TaxLevel:  []TaxLevel{{constants.T0_150k, 0.0}, {constants.T150k_500k, 29000.0}, {constants.T500k_1M, 0.0}, {constants.T1M_2M, 0.0}, {constants.T2M, 0.0}},
 			},
 			expectedCode: http.StatusOK,
 		},
 		{
-			name:         "Request parameters are invalid on Bind",
-			mockBehavior: func(ms *tax.MockService) {},
-			contentType:  "text/plain",
+			name: "Request parameters are invalid on Bind",
+			mockBehavior: func(ms *tax.MockService) {
+				// Do nothing
+			},
+			contentType:  constants.TEXT_PLAIN,
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:         "Request parameters are invalid on Validate",
-			mockBehavior: func(ms *tax.MockService) {},
-			contentType:  "application/json",
+			name: "Request parameters are invalid on Validate",
+			mockBehavior: func(ms *tax.MockService) {
+				// Do nothing
+			},
+			contentType: constants.APPLICATION_JSON,
 			request: CalculationsRequest{
 				TotalIncome: -500000.0,
 			},
@@ -169,7 +174,7 @@ func TestCalculations(t *testing.T) {
 			mockBehavior: func(ms *tax.MockService) {
 				ms.On("Calculate", mock.Anything, mock.Anything).Return(nil, errors.New("some error"))
 			},
-			contentType: "application/json",
+			contentType: constants.APPLICATION_JSON,
 			request: CalculationsRequest{
 				TotalIncome: 1500000.0,
 				WHT:         0.0,
@@ -216,7 +221,7 @@ func TestCalculations(t *testing.T) {
 	}
 }
 
-func TestCalculationRequest_Validation(t *testing.T) {
+func TestCalculationRequestValidation(t *testing.T) {
 	tests := []struct {
 		name    string
 		request CalculationsRequest
@@ -288,7 +293,7 @@ func TestCalculationRequest_Validation(t *testing.T) {
 	}
 }
 
-func TestCalculationsRequest_ToServiceRequest(t *testing.T) {
+func TestCalculationsRequestToServiceRequest(t *testing.T) {
 	tests := []struct {
 		name     string
 		request  CalculationsRequest

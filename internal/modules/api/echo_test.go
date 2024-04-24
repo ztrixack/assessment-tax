@@ -54,7 +54,7 @@ func TestEchoAPIRouting(t *testing.T) {
 	}
 }
 
-func TestEchoAPI_Notify(t *testing.T) {
+func TestEchoAPINotify(t *testing.T) {
 	server := setup()
 	defer server.Close()
 

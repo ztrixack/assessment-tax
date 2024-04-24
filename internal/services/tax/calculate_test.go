@@ -152,7 +152,9 @@ func TestCalculate(t *testing.T) {
 				Income:     -1,
 				Allowances: []Allowance{},
 			},
-			mockBehavior:   func(mock sqlmock.Sqlmock) {},
+			mockBehavior: func(mock sqlmock.Sqlmock) {
+				// Do nothing
+			},
 			expectedResult: nil,
 			wantErr:        true,
 		},

@@ -15,6 +15,7 @@ import (
 	"github.com/ztrixack/assessment-tax/internal/modules/api"
 	"github.com/ztrixack/assessment-tax/internal/modules/logger"
 	"github.com/ztrixack/assessment-tax/internal/services/tax"
+	"github.com/ztrixack/assessment-tax/internal/utils/constants"
 	"github.com/ztrixack/assessment-tax/internal/utils/csv"
 )
 
@@ -37,7 +38,7 @@ func TestToCalculationsResponse(t *testing.T) {
 			},
 			expected: CalculationsResponse{
 				Tax:      100.0,
-				TaxLevel: []TaxLevel{{"0-150,000", 0}, {"150,001-500,000", 0}, {"500,001-1,000,000", 0}, {"1,000,001-2,000,000", 0}, {"2,000,001 ขึ้นไป", 0}},
+				TaxLevel: []TaxLevel{{constants.T0_150k, 0}, {constants.T150k_500k, 0}, {constants.T500k_1M, 0}, {constants.T1M_2M, 0}, {constants.T2M, 0}},
 			},
 		},
 		{
@@ -50,7 +51,7 @@ func TestToCalculationsResponse(t *testing.T) {
 			expected: CalculationsResponse{
 				Tax:       100.0,
 				TaxRefund: pointerTo(50.0),
-				TaxLevel:  []TaxLevel{{"0-150,000", 0}, {"150,001-500,000", 0}, {"500,001-1,000,000", 0}, {"1,000,001-2,000,000", 0}, {"2,000,001 ขึ้นไป", 0}},
+				TaxLevel:  []TaxLevel{{constants.T0_150k, 0}, {constants.T150k_500k, 0}, {constants.T500k_1M, 0}, {constants.T1M_2M, 0}, {constants.T2M, 0}},
 			},
 		},
 	}
@@ -117,19 +118,19 @@ func TestRemapTaxLevels(t *testing.T) {
 	}{
 		{
 			name:     "matching lengths",
-			labels:   []string{"0-150,000", "150,001-500,000", "500,001-1,000,000"},
+			labels:   []string{constants.T0_150k, constants.T150k_500k, constants.T500k_1M},
 			levels:   []float64{10.0, 20.0, 30.0},
-			expected: []TaxLevel{{"0-150,000", 10.0}, {"150,001-500,000", 20.0}, {"500,001-1,000,000", 30.0}},
+			expected: []TaxLevel{{constants.T0_150k, 10.0}, {constants.T150k_500k, 20.0}, {constants.T500k_1M, 30.0}},
 		},
 		{
 			name:     "labels fewer than levels",
-			labels:   []string{"0-150,000", "150,001-500,000"},
+			labels:   []string{constants.T0_150k, constants.T150k_500k},
 			levels:   []float64{10.0, 20.0, 30.0},
 			expected: []TaxLevel{{"Bucket: #1", 10.0}, {"Bucket: #2", 20.0}, {"Bucket: #3", 30.0}},
 		},
 		{
 			name:     "labels more than levels",
-			labels:   []string{"0-150,000", "150,001-500,000", "500,001-1,000,000", "1,000,001-2,000,000"},
+			labels:   []string{constants.T0_150k, constants.T150k_500k, constants.T500k_1M, constants.T1M_2M},
 			levels:   []float64{10.0, 20.0, 30.0},
 			expected: []TaxLevel{{"Bucket: #1", 10.0}, {"Bucket: #2", 20.0}, {"Bucket: #3", 30.0}},
 		},

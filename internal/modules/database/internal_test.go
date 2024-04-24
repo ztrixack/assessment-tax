@@ -5,7 +5,16 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/stretchr/testify/assert"
 )
+
+func setup(t *testing.T) (*sql.DB, sqlmock.Sqlmock) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	return db, mock
+}
 
 func TestQueryOne(t *testing.T) {
 	tests := []struct {
@@ -40,30 +49,25 @@ func TestQueryOne(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, mock, err := sqlmock.New()
-			if err != nil {
-				t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-			}
+			db, mock := setup(t)
 			defer db.Close()
 
 			tt.mockBehaviour(mock)
-
 			row, err := queryOne(db, tt.query, tt.args...)
 
-			if (err != nil) != tt.wantErr {
-				t.Errorf("queryOne() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
 			}
-			if err == nil {
-				var id int
-				err = row.Scan(&id)
-				if err != nil && err != sql.ErrNoRows {
-					t.Errorf("Failed to scan row: %v", err)
-				}
+			assert.NoError(t, err)
+
+			var id int
+			err = row.Scan(&id)
+			if err != sql.ErrNoRows {
+				assert.NoError(t, err)
 			}
 
-			if err := mock.ExpectationsWereMet(); err != nil {
-				t.Errorf("there were unfulfilled expectations: %s", err)
-			}
+			mock.ExpectationsWereMet()
 		})
 	}
 }
@@ -113,23 +117,19 @@ func TestQuery(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, mock, err := sqlmock.New()
-			if err != nil {
-				t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-			}
+			db, mock := setup(t)
 			defer db.Close()
 
 			tt.mockBehaviour(mock)
+			_, err := query(db, tt.query, tt.args...)
 
-			_, err = query(db, tt.query, tt.args...)
-
-			if (err != nil) != tt.wantErr {
-				t.Errorf("query() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
 			}
+			assert.NoError(t, err)
 
-			if err := mock.ExpectationsWereMet(); err != nil {
-				t.Errorf("there were unfulfilled expectations: %s", err)
-			}
+			mock.ExpectationsWereMet()
 		})
 	}
 }
@@ -189,32 +189,23 @@ func TestExecute(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db, mock, err := sqlmock.New()
-			if err != nil {
-				t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-			}
+			db, mock := setup(t)
 			defer db.Close()
 
 			tt.mockSetup(mock)
 
 			result, err := execute(db, tt.query, tt.args...)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("execute() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
 			}
+			assert.NoError(t, err)
 
-			if err == nil {
-				count, err := result.RowsAffected()
-				if err != nil {
-					t.Errorf("error getting rows affected: %v", err)
-				}
-				if count != tt.wantCount {
-					t.Errorf("expected %d affected rows, got %d", tt.wantCount, count)
-				}
-			}
+			count, err := result.RowsAffected()
+			assert.NoError(t, err)
+			assert.Equal(t, tt.wantCount, count)
 
-			if err := mock.ExpectationsWereMet(); err != nil {
-				t.Errorf("there were unfulfilled expectations: %s", err)
-			}
+			mock.ExpectationsWereMet()
 		})
 	}
 }

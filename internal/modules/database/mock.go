@@ -30,8 +30,8 @@ func (p *sqlMockDB) Close() error {
 	return p.db.Close()
 }
 
-func (p *sqlMockDB) Query(query_ string, args ...interface{}) (*sql.Rows, error) {
-	return query(p.db, query_, args...)
+func (p *sqlMockDB) Query(qry string, args ...interface{}) (*sql.Rows, error) {
+	return query(p.db, qry, args...)
 }
 
 func (p *sqlMockDB) QueryOne(query string, args ...interface{}) (*sql.Row, error) {

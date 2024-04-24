@@ -12,8 +12,8 @@ test-integration:
 	docker compose -f docker-compose.test.yaml down
 
 coverage:
-	go test -cover -coverprofile=c.out -v ./...
-	go tool cover -html=c.out -o coverage.html
+	go test -cover -coverprofile=report.out -v ./...
+	go tool cover -html=report.out -o coverage.html
 
 clean:
 	go clean -i ./...
