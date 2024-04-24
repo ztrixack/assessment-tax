@@ -60,6 +60,34 @@ func TestCalculate(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "WHT more than tax (Refund)",
+			request: CalculateRequest{
+				Income:     500000.0,
+				WHT:        30000.0,
+				Allowances: []Allowance{},
+			},
+			mockBehavior: defaultMockBehavior,
+			expectedResult: &CalculateResponse{
+				Tax:    0.0,
+				Refund: 1000.0,
+			},
+			wantErr: false,
+		},
+		{
+			name: "WHT less than tax",
+			request: CalculateRequest{
+				Income:     500000.0,
+				WHT:        20000.0,
+				Allowances: []Allowance{},
+			},
+			mockBehavior: defaultMockBehavior,
+			expectedResult: &CalculateResponse{
+				Tax:    9000.0,
+				Refund: 0.0,
+			},
+			wantErr: false,
+		},
+		{
 			name: "Income is lower than all allowances",
 			request: CalculateRequest{
 				Income:     50000.0,

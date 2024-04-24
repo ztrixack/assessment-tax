@@ -11,7 +11,8 @@ type CalculateRequest struct {
 }
 
 type CalculateResponse struct {
-	Tax float64
+	Tax    float64
+	Refund float64
 }
 
 func (s *service) Calculate(ctx context.Context, req CalculateRequest) (*CalculateResponse, error) {
@@ -37,6 +38,7 @@ func (s *service) Calculate(ctx context.Context, req CalculateRequest) (*Calcula
 	}
 
 	return &CalculateResponse{
-		Tax: max(totalTax-req.WHT, 0),
+		Tax:    max(totalTax-req.WHT, 0),
+		Refund: max(req.WHT-totalTax, 0),
 	}, nil
 }
