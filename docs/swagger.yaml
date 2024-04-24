@@ -1,3 +1,40 @@
+definitions:
+  github_com_ztrixack_assessment-tax_internal_handlers_tax.Allowance:
+    properties:
+      allowanceType:
+        enum:
+        - donation
+        example: donation
+        type: string
+      amount:
+        example: 0
+        minimum: 0
+        type: number
+    required:
+    - allowanceType
+    type: object
+  tax.CalculationsRequest:
+    properties:
+      allowances:
+        items:
+          $ref: '#/definitions/github_com_ztrixack_assessment-tax_internal_handlers_tax.Allowance'
+        type: array
+      totalIncome:
+        example: 500000
+        minimum: 0
+        type: number
+      wht:
+        example: 0
+        minimum: 0
+        type: number
+    type: object
+  tax.CalculationsResponse:
+    properties:
+      tax:
+        type: number
+      taxRefund:
+        type: number
+    type: object
 info:
   contact:
     email: ztrixack.th@gmail.com
@@ -20,6 +57,32 @@ paths:
       summary: Hello, Go Bootcamp!
       tags:
       - system
+  /tax/calculations:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint calculates the tax and potentially applicable tax
+        refund and tax levels based on the provided total income, withholding tax,
+        and allowances.
+      parameters:
+      - description: Input request for tax calculation
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/tax.CalculationsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully calculated tax and returns the tax details
+          schema:
+            $ref: '#/definitions/tax.CalculationsResponse'
+        "400":
+          description: Bad request if the input validation fails
+      summary: Calculate Tax
+      tags:
+      - tax
 schemes:
 - http
 swagger: "2.0"

@@ -34,6 +34,17 @@ type CalculationsResponse struct {
 	TaxRefund *float64 `json:"taxRefund,omitempty"`
 }
 
+// Calculations calculates the tax based on total income, withholding tax (WHT), and allowances.
+//
+//	@summary		Calculate Tax
+//	@description	This endpoint calculates the tax and potentially applicable tax refund and tax levels based on the provided total income, withholding tax, and allowances.
+//	@tags			tax
+//	@accept			json
+//	@produce		json
+//	@param			request	body		CalculationsRequest		true	"Input request for tax calculation"
+//	@success		200		{object}	CalculationsResponse	"Successfully calculated tax and returns the tax details"
+//	@failure		400		"Bad request if the input validation fails"
+//	@router			/tax/calculations [post]
 func (h *handler) Calculations(c api.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()

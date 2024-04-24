@@ -3,10 +3,12 @@ package main
 import (
 	"github.com/ztrixack/assessment-tax/internal/handlers/swagger"
 	"github.com/ztrixack/assessment-tax/internal/handlers/system"
+	"github.com/ztrixack/assessment-tax/internal/handlers/tax"
 	"github.com/ztrixack/assessment-tax/internal/modules/api"
 	"github.com/ztrixack/assessment-tax/internal/modules/api/middlewares"
 	"github.com/ztrixack/assessment-tax/internal/modules/database"
 	"github.com/ztrixack/assessment-tax/internal/modules/logger"
+	tax_service "github.com/ztrixack/assessment-tax/internal/services/tax"
 
 	_ "github.com/ztrixack/assessment-tax/docs"
 )
@@ -21,20 +23,28 @@ import (
 //
 // @schemes		http
 func main() {
+	// modules
 	log := logger.NewZerolog(logger.Config())
-
-	_, err := database.NewPostgresDB(database.Config())
+	server := api.NewEchoAPI(api.Config())
+	server.Use(middlewares.Logger(log))
+	db, err := database.NewPostgresDB(database.Config())
 	if err != nil {
 		log.Err(err).C("Failed to connect to database")
 	}
+	defer db.Close()
 
-	server := api.NewEchoAPI(api.Config())
-	server.Use(middlewares.Logger(log))
+	// services
+	taxService := tax_service.New(log, db)
 
+	// handlers
 	system.New(server)
 	swagger.New(server)
+	tax.New(log, server, taxService)
 
-	log.I("Starting server")
-	server.Listen()
+	// application
+	log.Fields(logger.Fields{"port": server.Config().Port}).I("Starting server")
+	if err := server.Listen(); err != nil {
+		log.Err(err).C("Failed to start server")
+	}
 	log.I("Stopping server")
 }

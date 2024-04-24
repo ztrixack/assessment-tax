@@ -33,6 +33,97 @@
                     }
                 }
             }
+        },
+        "/tax/calculations": {
+            "post": {
+                "description": "This endpoint calculates the tax and potentially applicable tax refund and tax levels based on the provided total income, withholding tax, and allowances.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tax"
+                ],
+                "summary": "Calculate Tax",
+                "parameters": [
+                    {
+                        "description": "Input request for tax calculation",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/tax.CalculationsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully calculated tax and returns the tax details",
+                        "schema": {
+                            "$ref": "#/definitions/tax.CalculationsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request if the input validation fails"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "github_com_ztrixack_assessment-tax_internal_handlers_tax.Allowance": {
+            "type": "object",
+            "required": [
+                "allowanceType"
+            ],
+            "properties": {
+                "allowanceType": {
+                    "type": "string",
+                    "enum": [
+                        "donation"
+                    ],
+                    "example": "donation"
+                },
+                "amount": {
+                    "type": "number",
+                    "minimum": 0,
+                    "example": 0
+                }
+            }
+        },
+        "tax.CalculationsRequest": {
+            "type": "object",
+            "properties": {
+                "allowances": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_ztrixack_assessment-tax_internal_handlers_tax.Allowance"
+                    }
+                },
+                "totalIncome": {
+                    "type": "number",
+                    "minimum": 0,
+                    "example": 500000
+                },
+                "wht": {
+                    "type": "number",
+                    "minimum": 0,
+                    "example": 0
+                }
+            }
+        },
+        "tax.CalculationsResponse": {
+            "type": "object",
+            "properties": {
+                "tax": {
+                    "type": "number"
+                },
+                "taxRefund": {
+                    "type": "number"
+                }
+            }
         }
     }
 }
