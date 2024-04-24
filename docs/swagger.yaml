@@ -1,4 +1,22 @@
 definitions:
+  admin.DeductionsPersonalRequest:
+    properties:
+      amount:
+        example: 60000
+        maximum: 100000
+        minimum: 10000
+        type: number
+    type: object
+  admin.DeductionsPersonalResponse:
+    properties:
+      personalDeduction:
+        type: number
+    type: object
+  admin.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
   github_com_ztrixack_assessment-tax_internal_handlers_tax.Allowance:
     properties:
       allowanceType:
@@ -73,6 +91,42 @@ paths:
       summary: Hello, Go Bootcamp!
       tags:
       - system
+  /admin/deductions/personal:
+    post:
+      consumes:
+      - application/json
+      description: Sets the personal deduction based on the provided request parameters.
+      parameters:
+      - description: Input request for setting personal deduction
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/admin.DeductionsPersonalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully response with updated deduction details
+          schema:
+            $ref: '#/definitions/admin.DeductionsPersonalResponse'
+        "400":
+          description: Bad request if the input validation fails
+          schema:
+            $ref: '#/definitions/admin.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/admin.ErrorResponse'
+        "500":
+          description: Internal Server Error if there is a problem setting the deduction
+          schema:
+            $ref: '#/definitions/admin.ErrorResponse'
+      security:
+      - BasicAuth: []
+      summary: Set personal deduction
+      tags:
+      - admin/deductions
   /tax/calculations:
     post:
       consumes:
@@ -107,4 +161,7 @@ paths:
       - tax
 schemes:
 - http
+securityDefinitions:
+  BasicAuth:
+    type: basic
 swagger: "2.0"

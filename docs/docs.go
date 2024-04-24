@@ -39,6 +39,63 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/deductions/personal": {
+            "post": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Sets the personal deduction based on the provided request parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin/deductions"
+                ],
+                "summary": "Set personal deduction",
+                "parameters": [
+                    {
+                        "description": "Input request for setting personal deduction",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/admin.DeductionsPersonalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully response with updated deduction details",
+                        "schema": {
+                            "$ref": "#/definitions/admin.DeductionsPersonalResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request if the input validation fails",
+                        "schema": {
+                            "$ref": "#/definitions/admin.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/admin.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error if there is a problem setting the deduction",
+                        "schema": {
+                            "$ref": "#/definitions/admin.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/tax/calculations": {
             "post": {
                 "description": "This endpoint calculates the tax and potentially applicable tax refund and tax levels based on the provided total income, withholding tax, and allowances.",
@@ -87,6 +144,33 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "admin.DeductionsPersonalRequest": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "maximum": 100000,
+                    "minimum": 10000,
+                    "example": 60000
+                }
+            }
+        },
+        "admin.DeductionsPersonalResponse": {
+            "type": "object",
+            "properties": {
+                "personalDeduction": {
+                    "type": "number"
+                }
+            }
+        },
+        "admin.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_ztrixack_assessment-tax_internal_handlers_tax.Allowance": {
             "type": "object",
             "required": [
@@ -163,6 +247,11 @@ const docTemplate = `{
                     "type": "number"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BasicAuth": {
+            "type": "basic"
         }
     }
 }`
