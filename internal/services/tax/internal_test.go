@@ -71,6 +71,13 @@ func TestCalculateProgressiveTax(t *testing.T) {
 			expectedErr:   nil,
 		},
 		{
+			name:          "Story: EXP07",
+			income:        290000,
+			expectedTax:   14000,
+			expectedSteps: []float64{0, 14000, 0, 0, 0},
+			expectedErr:   nil,
+		},
+		{
 			name:        "Negative income",
 			income:      -100,
 			expectedTax: 0,
@@ -160,8 +167,8 @@ func TestCalculateProgressiveTax(t *testing.T) {
 
 func TestCalculateAllowances(t *testing.T) {
 	defaultMockBehavior := func(mock sqlmock.Sqlmock) {
-		rows := sqlmock.NewRows([]string{"personal", "donation"}).AddRow(60000, 100000)
-		mock.ExpectPrepare("SELECT personal, donation FROM allowances").ExpectQuery().WillReturnRows(rows)
+		rows := sqlmock.NewRows([]string{"personal", "donation", "k_receipt"}).AddRow(60000, 100000, 50000)
+		mock.ExpectPrepare("SELECT personal, donation, k_receipt FROM allowances").ExpectQuery().WillReturnRows(rows)
 	}
 
 	tests := []struct {
@@ -186,6 +193,13 @@ func TestCalculateAllowances(t *testing.T) {
 			wantErr:        false,
 		},
 		{
+			name:           "Story: EXP07",
+			mockBehavior:   defaultMockBehavior,
+			allowances:     []Allowance{{Type: KReceipt, Amount: 200000}, {Type: Donation, Amount: 100000}},
+			expectedResult: 60000 + 100000 + 50000,
+			wantErr:        false,
+		},
+		{
 			name:           "No allowances",
 			mockBehavior:   defaultMockBehavior,
 			allowances:     []Allowance{},
@@ -195,48 +209,56 @@ func TestCalculateAllowances(t *testing.T) {
 		{
 			name:           "All minimum values",
 			mockBehavior:   defaultMockBehavior,
-			allowances:     []Allowance{{Type: Donation, Amount: 0}},
+			allowances:     []Allowance{{Type: Donation, Amount: 0}, {Type: KReceipt, Amount: 0}},
 			expectedResult: 60000,
 			wantErr:        false,
 		},
 		{
 			name:           "All maximum values",
 			mockBehavior:   defaultMockBehavior,
-			allowances:     []Allowance{{Type: Donation, Amount: 100000}},
-			expectedResult: 60000 + 100000,
+			allowances:     []Allowance{{Type: Donation, Amount: 100000}, {Type: KReceipt, Amount: 50000}},
+			expectedResult: 60000 + 100000 + 50000,
 			wantErr:        false,
 		},
 		{
 			name:         "Negative amounts",
 			mockBehavior: defaultMockBehavior,
-			allowances:   []Allowance{{Type: Donation, Amount: -50}},
+			allowances:   []Allowance{{Type: Donation, Amount: -50}, {Type: KReceipt, Amount: -20}},
 			wantErr:      true,
 		},
 		{
 			name:           "Above maximum limits",
 			mockBehavior:   defaultMockBehavior,
-			allowances:     []Allowance{{Type: Donation, Amount: 100001}},
-			expectedResult: 60000 + 100000,
+			allowances:     []Allowance{{Type: Donation, Amount: 100001}, {Type: KReceipt, Amount: 50001}},
+			expectedResult: 60000 + 100000 + 50000,
 			wantErr:        false,
 		},
 		{
-			name:         "Multi allowances and below maximum limits",
-			mockBehavior: defaultMockBehavior,
-			allowances: []Allowance{
-				{Type: Donation, Amount: 30000},
-				{Type: Donation, Amount: 30000},
-			},
+			name:           "Multi allowances and below maximum limits",
+			mockBehavior:   defaultMockBehavior,
+			allowances:     []Allowance{{Type: Donation, Amount: 30000}, {Type: Donation, Amount: 30000}},
 			expectedResult: 60000 + 60000,
 			wantErr:        false,
 		},
 		{
-			name:         "Multi allowances and above maximum limits",
-			mockBehavior: defaultMockBehavior,
-			allowances: []Allowance{
-				{Type: Donation, Amount: 60000},
-				{Type: Donation, Amount: 80000},
-			},
+			name:           "Multi allowances and above maximum limits",
+			mockBehavior:   defaultMockBehavior,
+			allowances:     []Allowance{{Type: Donation, Amount: 60000}, {Type: Donation, Amount: 80000}},
 			expectedResult: 60000 + 100000,
+			wantErr:        false,
+		},
+		{
+			name:           "Multi KReceipt and below maximum limits",
+			mockBehavior:   defaultMockBehavior,
+			allowances:     []Allowance{{Type: KReceipt, Amount: 20000}, {Type: KReceipt, Amount: 10000}},
+			expectedResult: 60000 + 30000,
+			wantErr:        false,
+		},
+		{
+			name:           "Multi KReceipt and above maximum limits",
+			mockBehavior:   defaultMockBehavior,
+			allowances:     []Allowance{{Type: KReceipt, Amount: 30000}, {Type: KReceipt, Amount: 30000}},
+			expectedResult: 60000 + 50000,
 			wantErr:        false,
 		},
 		{
@@ -248,7 +270,7 @@ func TestCalculateAllowances(t *testing.T) {
 		{
 			name: "Error with database",
 			mockBehavior: func(mock sqlmock.Sqlmock) {
-				mock.ExpectPrepare("SELECT personal, donation FROM allowances").ExpectQuery().WillReturnError(errors.New("some error"))
+				mock.ExpectPrepare("SELECT personal, donation, k_receipt FROM allowances").ExpectQuery().WillReturnError(errors.New("some error"))
 			},
 			allowances: []Allowance{},
 			wantErr:    true,

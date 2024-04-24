@@ -22,6 +22,7 @@ type AllowanceType string
 const (
 	Personal AllowanceType = "personal"
 	Donation AllowanceType = "donation"
+	KReceipt AllowanceType = "k-receipt"
 )
 
 var (
@@ -39,6 +40,7 @@ func (s *service) calculateAllowances(allowanceList []Allowance) (float64, error
 
 	personal := allowances[Personal]
 	donation := 0.0
+	kreceipt := 0.0
 
 	for _, allowance := range allowanceList {
 		if allowance.Amount < 0 {
@@ -50,6 +52,9 @@ func (s *service) calculateAllowances(allowanceList []Allowance) (float64, error
 		case Donation:
 			donation += allowance.Amount
 
+		case KReceipt:
+			kreceipt += allowance.Amount
+
 		default:
 			s.log.Fields(map[string]interface{}{"allowance": allowance}).W("Allowance type not supported.")
 			return 0, ErrUnsupportedAllowanceType
@@ -57,8 +62,9 @@ func (s *service) calculateAllowances(allowanceList []Allowance) (float64, error
 	}
 
 	donation = calculateAllowance(donation, 0, allowances[Donation])
+	kreceipt = calculateAllowance(kreceipt, 0, allowances[KReceipt])
 
-	return personal + donation, nil
+	return personal + donation + kreceipt, nil
 }
 
 func calculateAllowance(amount, lower, upper float64) float64 {
@@ -66,18 +72,18 @@ func calculateAllowance(amount, lower, upper float64) float64 {
 }
 
 func (s *service) getAllowances() (AllowanceList, error) {
-	row, err := s.db.QueryOne("SELECT personal, donation FROM allowances")
+	row, err := s.db.QueryOne("SELECT personal, donation, k_receipt FROM allowances")
 	if err != nil {
 		return nil, err
 	}
 
-	var personal, donation float64
-	err = row.Scan(&personal, &donation)
+	var personal, donation, kreceipt float64
+	err = row.Scan(&personal, &donation, &kreceipt)
 	if err != nil {
 		return nil, err
 	}
 
-	return AllowanceList{Personal: personal, Donation: donation}, nil
+	return AllowanceList{Personal: personal, Donation: donation, KReceipt: kreceipt}, nil
 }
 
 func calculateStepTax(income, lower, upper float64, rate float64) float64 {

@@ -88,11 +88,13 @@ func TestRemapAllowances(t *testing.T) {
 			input: []Allowance{
 				{AllowanceType: "donation", Amount: 1000},
 				{AllowanceType: "donation", Amount: 100000},
+				{AllowanceType: "k-receipt", Amount: 500},
 				{AllowanceType: "unknown", Amount: 300},
 			},
 			expected: []tax.Allowance{
 				{Type: tax.AllowanceType("donation"), Amount: 1000},
 				{Type: tax.AllowanceType("donation"), Amount: 100000},
+				{Type: tax.AllowanceType("k-receipt"), Amount: 500},
 				{Type: tax.AllowanceType("unknown"), Amount: 300},
 			},
 		},

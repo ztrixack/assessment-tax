@@ -224,7 +224,8 @@ const docTemplate = `{
                 "allowanceType": {
                     "type": "string",
                     "enum": [
-                        "donation"
+                        "donation",
+                        "k-receipt"
                     ],
                     "example": "donation"
                 },

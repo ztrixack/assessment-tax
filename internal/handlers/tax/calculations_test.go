@@ -98,6 +98,23 @@ func TestCalculations(t *testing.T) {
 			expectedCode: http.StatusOK,
 		},
 		{
+			name: "Story: EXP07",
+			mockBehavior: func(ms *tax.MockService) {
+				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 14000.0, Refund: 0.0, TaxLevel: []float64{0.0, 14000.0, 0.0, 0.0, 0.0}}, nil)
+			},
+			contentType: "application/json",
+			request: CalculationsRequest{
+				TotalIncome: 500000.0,
+				WHT:         0.0,
+				Allowances:  []Allowance{{AllowanceType: "k-receipt", Amount: 200000.0}, {AllowanceType: "donation", Amount: 100000.0}},
+			},
+			expected: CalculationsResponse{
+				Tax:      14000.0,
+				TaxLevel: []TaxLevel{{"0-150,000", 0.0}, {"150,001-500,000", 14000.0}, {"500,001-1,000,000", 0.0}, {"1,000,001-2,000,000", 0.0}, {"2,000,001 ขึ้นไป", 0.0}},
+			},
+			expectedCode: http.StatusOK,
+		},
+		{
 			name: "Successful calculation",
 			mockBehavior: func(ms *tax.MockService) {
 				ms.On("Calculate", mock.Anything, mock.Anything).Return(&tax.CalculateResponse{Tax: 1360000.0, Refund: 0.0, TaxLevel: []float64{0.0, 35000.0, 75000.0, 200000.0, 1050000.0}}, nil)
