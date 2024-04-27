@@ -16,11 +16,11 @@ import (
 	"github.com/ztrixack/assessment-tax/internal/services/tax"
 )
 
-func TestCalculations(t *testing.T) {
-	pointerTo := func(value float64) *float64 {
-		return &value
-	}
+func pointerTo(value float64) *float64 {
+	return &value
+}
 
+func TestCalculations(t *testing.T) {
 	tests := []struct {
 		name         string
 		mockBehavior func(*tax.MockService)
@@ -36,7 +36,7 @@ func TestCalculations(t *testing.T) {
 			},
 			contentType: "application/json",
 			request: CalculationsRequest{
-				TotalIncome: 500000.0,
+				TotalIncome: pointerTo(500000.0),
 				WHT:         0.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0.0}},
 			},
@@ -53,7 +53,7 @@ func TestCalculations(t *testing.T) {
 			},
 			contentType: "application/json",
 			request: CalculationsRequest{
-				TotalIncome: 500000.0,
+				TotalIncome: pointerTo(500000.0),
 				WHT:         25000.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0.0}},
 			},
@@ -70,7 +70,7 @@ func TestCalculations(t *testing.T) {
 			},
 			contentType: "application/json",
 			request: CalculationsRequest{
-				TotalIncome: 500000.0,
+				TotalIncome: pointerTo(500000.0),
 				WHT:         0.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 200000.0}},
 			},
@@ -87,7 +87,7 @@ func TestCalculations(t *testing.T) {
 			},
 			contentType: "application/json",
 			request: CalculationsRequest{
-				TotalIncome: 500000.0,
+				TotalIncome: pointerTo(500000.0),
 				WHT:         0.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 200000.0}},
 			},
@@ -104,7 +104,7 @@ func TestCalculations(t *testing.T) {
 			},
 			contentType: "application/json",
 			request: CalculationsRequest{
-				TotalIncome: 500000.0,
+				TotalIncome: pointerTo(500000.0),
 				WHT:         0.0,
 				Allowances:  []Allowance{{AllowanceType: "k-receipt", Amount: 200000.0}, {AllowanceType: "donation", Amount: 100000.0}},
 			},
@@ -121,7 +121,7 @@ func TestCalculations(t *testing.T) {
 			},
 			contentType: "application/json",
 			request: CalculationsRequest{
-				TotalIncome: 5000000.0,
+				TotalIncome: pointerTo(5000000.0),
 				WHT:         0.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0.0}},
 			},
@@ -138,7 +138,7 @@ func TestCalculations(t *testing.T) {
 			},
 			contentType: "application/json",
 			request: CalculationsRequest{
-				TotalIncome: 500000.0,
+				TotalIncome: pointerTo(500000.0),
 				WHT:         50000.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0.0}},
 			},
@@ -160,7 +160,7 @@ func TestCalculations(t *testing.T) {
 			mockBehavior: func(ms *tax.MockService) {},
 			contentType:  "application/json",
 			request: CalculationsRequest{
-				TotalIncome: -500000.0,
+				TotalIncome: pointerTo(-500000.0),
 			},
 			expectedCode: http.StatusBadRequest,
 		},
@@ -171,7 +171,7 @@ func TestCalculations(t *testing.T) {
 			},
 			contentType: "application/json",
 			request: CalculationsRequest{
-				TotalIncome: 1500000.0,
+				TotalIncome: pointerTo(1500000.0),
 				WHT:         0.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0.0}},
 			},
@@ -225,7 +225,7 @@ func TestCalculationRequest_Validation(t *testing.T) {
 		{
 			name: "valid request",
 			request: CalculationsRequest{
-				TotalIncome: 500000.0,
+				TotalIncome: pointerTo(500000.0),
 				WHT:         50000.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 200000.0}},
 			},
@@ -234,14 +234,14 @@ func TestCalculationRequest_Validation(t *testing.T) {
 		{
 			name: "no wht",
 			request: CalculationsRequest{
-				TotalIncome: 500000.0,
+				TotalIncome: pointerTo(500000.0),
 			},
 			wantErr: false,
 		},
 		{
 			name: "no allowances",
 			request: CalculationsRequest{
-				TotalIncome: 500000.0,
+				TotalIncome: pointerTo(500000.0),
 				WHT:         0.0,
 			},
 			wantErr: false,
@@ -249,7 +249,7 @@ func TestCalculationRequest_Validation(t *testing.T) {
 		{
 			name: "invalid total income",
 			request: CalculationsRequest{
-				TotalIncome: -1,
+				TotalIncome: pointerTo(-1),
 				WHT:         0.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0}},
 			},
@@ -258,7 +258,7 @@ func TestCalculationRequest_Validation(t *testing.T) {
 		{
 			name: "invalid allowance type",
 			request: CalculationsRequest{
-				TotalIncome: 500000.0,
+				TotalIncome: pointerTo(500000.0),
 				WHT:         5000.0,
 				Allowances:  []Allowance{{AllowanceType: "unknown", Amount: 10000}},
 			},
@@ -267,10 +267,15 @@ func TestCalculationRequest_Validation(t *testing.T) {
 		{
 			name: "invalid allowance amount",
 			request: CalculationsRequest{
-				TotalIncome: 500000.0,
+				TotalIncome: pointerTo(500000.0),
 				WHT:         5000.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: -500}},
 			},
+			wantErr: true,
+		},
+		{
+			name:    "No request",
+			request: CalculationsRequest{},
 			wantErr: true,
 		},
 	}
@@ -297,7 +302,7 @@ func TestCalculationsRequest_ToServiceRequest(t *testing.T) {
 		{
 			name: "valid request",
 			request: CalculationsRequest{
-				TotalIncome: 500000.0,
+				TotalIncome: pointerTo(500000.0),
 				WHT:         5000.0,
 				Allowances: []Allowance{
 					{AllowanceType: "donation", Amount: 10000},
