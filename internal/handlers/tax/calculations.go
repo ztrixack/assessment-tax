@@ -11,14 +11,14 @@ import (
 )
 
 type CalculationsRequest struct {
-	TotalIncome float64     `json:"totalIncome" validate:"min=0" example:"500000.0"`
+	TotalIncome *float64    `json:"totalIncome" validate:"min=0" example:"500000.0"`
 	WHT         float64     `json:"wht" validate:"min=0" example:"0.0"`
 	Allowances  []Allowance `json:"allowances" validate:"dive"`
 }
 
 func (r *CalculationsRequest) toServiceRequest() tax.CalculateRequest {
 	return tax.CalculateRequest{
-		Income:     r.TotalIncome,
+		Income:     *r.TotalIncome,
 		WHT:        r.WHT,
 		Allowances: []tax.Allowance{},
 	}
