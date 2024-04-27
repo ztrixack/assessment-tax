@@ -16,6 +16,10 @@ import (
 	"github.com/ztrixack/assessment-tax/internal/services/tax"
 )
 
+func pointerTo(value float64) *float64 {
+	return &value
+}
+
 func TestCalculations(t *testing.T) {
 	tests := []struct {
 		name         string
@@ -32,7 +36,7 @@ func TestCalculations(t *testing.T) {
 			},
 			contentType: "application/json",
 			request: CalculationsRequest{
-				TotalIncome: 500000.0,
+				TotalIncome: pointerTo(500000.0),
 				WHT:         0.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0.0}},
 			},
@@ -48,7 +52,7 @@ func TestCalculations(t *testing.T) {
 			},
 			contentType: "application/json",
 			request: CalculationsRequest{
-				TotalIncome: 1500000.0,
+				TotalIncome: pointerTo(1500000.0),
 				WHT:         0.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0.0}},
 			},
@@ -68,7 +72,7 @@ func TestCalculations(t *testing.T) {
 			mockBehavior: func(ms *tax.MockService) {},
 			contentType:  "application/json",
 			request: CalculationsRequest{
-				TotalIncome: -500000.0,
+				TotalIncome: pointerTo(-500000.0),
 			},
 			expectedCode: http.StatusBadRequest,
 		},
@@ -79,7 +83,7 @@ func TestCalculations(t *testing.T) {
 			},
 			contentType: "application/json",
 			request: CalculationsRequest{
-				TotalIncome: 1500000.0,
+				TotalIncome: pointerTo(1500000.0),
 				WHT:         0.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0.0}},
 			},
@@ -133,7 +137,7 @@ func TestCalculationRequest_Validation(t *testing.T) {
 		{
 			name: "valid request",
 			request: CalculationsRequest{
-				TotalIncome: 500000.0,
+				TotalIncome: pointerTo(500000.0),
 				WHT:         0.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0}},
 			},
@@ -142,14 +146,14 @@ func TestCalculationRequest_Validation(t *testing.T) {
 		{
 			name: "no wht",
 			request: CalculationsRequest{
-				TotalIncome: 500000.0,
+				TotalIncome: pointerTo(500000.0),
 			},
 			wantErr: false,
 		},
 		{
 			name: "no allowances",
 			request: CalculationsRequest{
-				TotalIncome: 500000.0,
+				TotalIncome: pointerTo(500000.0),
 				WHT:         0.0,
 			},
 			wantErr: false,
@@ -157,10 +161,15 @@ func TestCalculationRequest_Validation(t *testing.T) {
 		{
 			name: "invalid total income",
 			request: CalculationsRequest{
-				TotalIncome: -1,
+				TotalIncome: pointerTo(-1),
 				WHT:         0.0,
 				Allowances:  []Allowance{{AllowanceType: "donation", Amount: 0}},
 			},
+			wantErr: true,
+		},
+		{
+			name:    "No request",
+			request: CalculationsRequest{},
 			wantErr: true,
 		},
 	}
