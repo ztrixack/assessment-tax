@@ -34,3 +34,6 @@ run-release:
 run:
 	docker compose -f docker-compose.yaml up -d
 	PORT="8080" DATABASE_URL=host="localhost port=5432 user=postgres password=postgres dbname=ktaxes sslmode=disable" ADMIN_USERNAME="adminTax" ADMIN_PASSWORD="admin!" go run main.go
+
+stop:
+	docker compose -f docker-compose.yaml down
